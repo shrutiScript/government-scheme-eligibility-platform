@@ -1,0 +1,11 @@
+{
+  "name": "government-scheme-eligibility-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "server": "node --watch server/server.js",
+    "client": "npm run dev --prefix client",
+    "dev": "node --watch server/server.js"
+  }
+}
