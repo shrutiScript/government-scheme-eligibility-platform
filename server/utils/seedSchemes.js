@@ -1,6 +1,6 @@
 import Scheme from '../models/Scheme.js';
 
-const initialSchemes = [
+export const initialSchemes = [
   {
     title: 'Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)',
     shortDescription: 'Financial benefit of ₹6,000 per year transferred directly to landholding farmer families across India.',
@@ -449,12 +449,16 @@ const initialSchemes = [
 
 export const seedSchemesIfEmpty = async () => {
   try {
-    // Re-seed database to ensure full detailed fields exist
-    console.log('[Seed] Refreshing government schemes collection in MongoDB...');
-    await Scheme.deleteMany({});
-    await Scheme.insertMany(initialSchemes);
-    console.log(`[Seed] Successfully seeded ${initialSchemes.length} rich government schemes!`);
+    const count = await Scheme.countDocuments();
+    if (count === 0) {
+      console.log('[Seed] Government schemes collection is empty. Seeding initial schemes...');
+      await Scheme.insertMany(initialSchemes);
+      console.log(`[Seed] Successfully seeded ${initialSchemes.length} rich government schemes!`);
+    } else {
+      console.log(`[Seed] Database already contains ${count} schemes. Skipping seeding.`);
+    }
   } catch (error) {
     console.error('[Seed Error] Failed to seed schemes:', error.message);
   }
 };
+

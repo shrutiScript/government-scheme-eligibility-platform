@@ -14,6 +14,7 @@ import { SchemeDetailPage } from './pages/SchemeDetailPage';
 import { EligibilityPage } from './pages/EligibilityPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { YourSchemesPage } from './pages/YourSchemesPage';
 import { DashboardPage } from './pages/DashboardPage';
@@ -29,7 +30,7 @@ const AdminProtectedRoute = ({ children }) => {
   const { isAdmin, loading } = useAuth();
   const adminToken =
     typeof window !== 'undefined'
-      ? sessionStorage.getItem('gov_admin_token') || localStorage.getItem('gov_admin_token')
+      ? sessionStorage.getItem('gov_admin_token')
       : null;
 
   if (loading) {
@@ -49,17 +50,12 @@ const AdminProtectedRoute = ({ children }) => {
 
 /**
  * Citizen Protected Route
- * Accessible strictly by authenticated Citizens.
- * - Redirects Admins to /admin.
+ * Accessible strictly by authenticated Citizens in the current tab session.
  * - Redirects Blocked Citizens to /blocked.
  * - Redirects unauthenticated guests to /login.
  */
 const CitizenProtectedRoute = ({ children }) => {
-  const { isCitizenAuthenticated, citizenUser, isAdmin, loading } = useAuth();
-  const adminToken =
-    typeof window !== 'undefined'
-      ? sessionStorage.getItem('gov_admin_token') || localStorage.getItem('gov_admin_token')
-      : null;
+  const { isCitizenAuthenticated, citizenUser, loading } = useAuth();
 
   if (loading) {
     return (
@@ -67,10 +63,6 @@ const CitizenProtectedRoute = ({ children }) => {
         Loading...
       </div>
     );
-  }
-
-  if (isAdmin || Boolean(adminToken)) {
-    return <Navigate to="/admin" replace />;
   }
 
   if (citizenUser?.isBlocked) {
@@ -178,6 +170,14 @@ export const App = () => {
               element={
                 <AuthLayout>
                   <RegisterPage />
+                </AuthLayout>
+              }
+            />
+            <Route
+              path="/forgot-password"
+              element={
+                <AuthLayout>
+                  <ForgotPasswordPage />
                 </AuthLayout>
               }
             />

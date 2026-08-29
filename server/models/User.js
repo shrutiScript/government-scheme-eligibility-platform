@@ -81,6 +81,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    resetPasswordOtp: {
+      type: String,
+      default: null
+    },
+    resetPasswordExpire: {
+      type: Date,
+      default: null
+    },
     avatar: {
       type: String,
       default: ''

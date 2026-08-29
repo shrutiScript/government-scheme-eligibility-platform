@@ -8,7 +8,7 @@ export const AuthContext = createContext(null);
 const getStorageItem = (key) => {
   if (typeof window === 'undefined') return null;
   try {
-    return sessionStorage.getItem(key) || localStorage.getItem(key);
+    return sessionStorage.getItem(key);
   } catch {
     return null;
   }
@@ -18,7 +18,6 @@ const setStorageItem = (key, value) => {
   if (typeof window === 'undefined') return;
   try {
     sessionStorage.setItem(key, value);
-    localStorage.setItem(key, value);
   } catch {}
 };
 
@@ -26,12 +25,23 @@ const removeStorageItem = (key) => {
   if (typeof window === 'undefined') return;
   try {
     sessionStorage.removeItem(key);
-    localStorage.removeItem(key);
   } catch {}
 };
 
+// Ensure legacy shared localStorage tokens do not pollute tab isolation
+if (typeof window !== 'undefined') {
+  try {
+    localStorage.removeItem('gov_admin_token');
+    localStorage.removeItem('gov_admin_user');
+    localStorage.removeItem('gov_user_token');
+    localStorage.removeItem('gov_token');
+    localStorage.removeItem('gov_citizen_user');
+    localStorage.removeItem('gov_user');
+  } catch {}
+}
+
 export const AuthProvider = ({ children }) => {
-  // Citizen state (tab-isolated with sessionStorage priority)
+  // Citizen state (strictly tab-isolated via sessionStorage)
   const [citizenUser, setCitizenUser] = useState(() => {
     try {
       if (typeof window !== 'undefined' && window.location.search.includes('blocked=1')) {
@@ -52,7 +62,7 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  // Admin state (tab-isolated with sessionStorage priority)
+  // Admin state (strictly tab-isolated via sessionStorage)
   const [adminUser, setAdminUser] = useState(() => {
     try {
       const storedAdmin = getStorageItem('gov_admin_user');
@@ -148,6 +158,19 @@ export const AuthProvider = ({ children }) => {
       setCitizenUser(updatedUserData);
       setStorageItem('gov_citizen_user', JSON.stringify(updatedUserData));
     }
+  }, []);
+
+  // Update citizen saved schemes immediately in state & sessionStorage
+  const updateSavedSchemes = useCallback((newSavedSchemes) => {
+    setCitizenUser((prev) => {
+      if (!prev) return prev;
+      const updated = {
+        ...prev,
+        savedSchemes: newSavedSchemes || []
+      };
+      setStorageItem('gov_citizen_user', JSON.stringify(updated));
+      return updated;
+    });
   }, []);
 
   // Check and sync user & admin status upon page refresh
@@ -326,21 +349,6 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.removeItem('gov_cached_eligibility');
     } catch {}
 
-    // Clear localStorage for this tab's session
-    try {
-      const storedCitizenStr = localStorage.getItem('gov_citizen_user');
-      if (storedCitizenStr) {
-        const storedCitizen = JSON.parse(storedCitizenStr);
-        if (storedCitizen?._id === currentUid || storedCitizen?.id === currentUid) {
-          localStorage.removeItem('gov_user_token');
-          localStorage.removeItem('gov_token');
-          localStorage.removeItem('gov_citizen_user');
-          localStorage.removeItem('gov_user');
-          localStorage.removeItem('gov_cached_eligibility');
-        }
-      }
-    } catch {}
-
     setCitizenUser(null);
     setCachedEligibility(null);
   };
@@ -354,8 +362,6 @@ export const AuthProvider = ({ children }) => {
     try {
       sessionStorage.removeItem('gov_admin_token');
       sessionStorage.removeItem('gov_admin_user');
-      localStorage.removeItem('gov_admin_token');
-      localStorage.removeItem('gov_admin_user');
     } catch {}
 
     setAdminUser(null);
@@ -376,6 +382,7 @@ export const AuthProvider = ({ children }) => {
         logoutCitizen: logout,
         logoutAdmin,
         updateUserState,
+        updateSavedSchemes,
         cachedEligibility,
         isProfileComplete,
         runBackgroundEligibilityCheck,

@@ -22,7 +22,7 @@ const CATEGORY_META = {
 };
 
 export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false, index = 0, isInitiallySaved = false }) => {
-  const { citizenUser, isCitizenAuthenticated } = useAuth();
+  const { citizenUser, isCitizenAuthenticated, updateUserState, updateSavedSchemes } = useAuth();
   const { notifySuccess, notifyError, notifyWarning } = useNotification();
   const [saved, setSaved] = useState(isInitiallySaved);
   const [saving, setSaving] = useState(false);
@@ -34,6 +34,8 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
         return id?.toString() === scheme._id?.toString();
       });
       setSaved(isSaved);
+    } else {
+      setSaved(false);
     }
   }, [citizenUser, scheme._id]);
 
@@ -51,17 +53,31 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
 
     try {
       if (saved) {
-        await userService.removeSavedScheme(scheme._id);
-        setSaved(false);
-        notifySuccess(`"${scheme.title}" removed from Your Schemes`);
+        const res = await userService.removeSavedScheme(scheme._id);
+        if (res?.success) {
+          setSaved(false);
+          if (res.user) {
+            updateUserState(res.user);
+          } else if (res.savedSchemes) {
+            updateSavedSchemes(res.savedSchemes);
+          }
+          notifySuccess(`"${scheme.title}" removed from Your Schemes`);
+        }
       } else {
-        await userService.saveScheme(scheme._id);
-        setSaved(true);
-        notifySuccess(`"${scheme.title}" saved to Your Schemes!`);
+        const res = await userService.saveScheme(scheme._id);
+        if (res?.success) {
+          setSaved(true);
+          if (res.user) {
+            updateUserState(res.user);
+          } else if (res.savedSchemes) {
+            updateSavedSchemes(res.savedSchemes);
+          }
+          notifySuccess(`"${scheme.title}" saved to Your Schemes!`);
+        }
       }
     } catch (err) {
       console.error('Failed to toggle bookmark:', err);
-      notifyError('Failed to update bookmark. Please try again.');
+      notifyError(err?.response?.data?.message || err?.message || 'Failed to update bookmark. Please try again.');
     } finally {
       setSaving(false);
     }

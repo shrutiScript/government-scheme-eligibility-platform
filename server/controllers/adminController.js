@@ -31,10 +31,40 @@ export const getStats = async (req, res, next) => {
     const categoryDistribution = await Scheme.aggregate([
       {
         $group: {
-          _id: '$category',
+          _id: { $ifNull: ['$category', 'General Welfare'] },
           total: { $sum: 1 },
-          active: { $sum: { $cond: [{ $eq: ['$status', 'Active'] }, 1, 0] } },
-          inactive: { $sum: { $cond: [{ $eq: ['$status', 'Inactive'] }, 1, 0] } }
+          active: {
+            $sum: {
+              $cond: [
+                {
+                  $or: [
+                    { $eq: ['$status', 'Active'] },
+                    { $eq: ['$status', 'active'] },
+                    { $eq: ['$status', 'ACTIVE'] },
+                    { $eq: ['$isActive', true] }
+                  ]
+                },
+                1,
+                0
+              ]
+            }
+          },
+          inactive: {
+            $sum: {
+              $cond: [
+                {
+                  $or: [
+                    { $eq: ['$status', 'Inactive'] },
+                    { $eq: ['$status', 'inactive'] },
+                    { $eq: ['$status', 'INACTIVE'] },
+                    { $eq: ['$isActive', false] }
+                  ]
+                },
+                1,
+                0
+              ]
+            }
+          }
         }
       },
       { $sort: { total: -1 } }
@@ -347,12 +377,12 @@ export const deleteUser = async (req, res, next) => {
     await logActivity({
       action: 'DELETE USER',
       user: req.user,
-      details: `Admin "${adminName}" deleted user account "${targetUser.name}" (${targetUser.email}).`
+      details: `Admin "${adminName}" permanently deleted user account "${targetUser.name}" (${targetUser.email}).`
     });
 
     return res.status(200).json({
       success: true,
-      message: 'User account deleted successfully'
+      message: `User account "${targetUser.name}" deleted permanently from the database.`
     });
   } catch (error) {
     next(error);

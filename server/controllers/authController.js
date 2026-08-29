@@ -376,3 +376,193 @@ export const getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Forgot Password - Generate 6-digit OTP (stored in DB & displayed for user)
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || typeof email !== 'string' || !email.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter your registered email address.'
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid email address.'
+      });
+    }
+
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Please enter a valid registered email address.'
+      });
+    }
+
+    if (user.isBlocked || user.status === 'blocked' || user.status === 'BLOCKED') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been suspended. Please contact the administrator.'
+      });
+    }
+
+    // Generate secure 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expireTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+    user.resetPasswordOtp = otp;
+    user.resetPasswordExpire = expireTime;
+    await user.save();
+
+    console.log(`[Password Reset] 🔑 Verification Code for ${cleanEmail}: ${otp} (expires in 10 mins)`);
+
+    await logActivity({
+      action: 'FORGOT PASSWORD OTP REQUESTED',
+      user,
+      details: `User "${user.name}" (${user.email}) requested a password reset verification code.`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Verification code sent successfully.',
+      email: cleanEmail,
+      otp // Provided so user sees verification code immediately without needing external Gmail setup
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Verify Reset OTP
+// @route   POST /api/auth/verify-reset-otp
+// @access  Public
+export const verifyResetOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and verification code are required.'
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanOtp = String(otp).trim();
+
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Please enter a valid registered email address.'
+      });
+    }
+
+    if (
+      !user.resetPasswordOtp ||
+      user.resetPasswordOtp !== cleanOtp ||
+      !user.resetPasswordExpire ||
+      user.resetPasswordExpire < new Date()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset code.'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Verification code verified successfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reset Password with OTP
+// @route   POST /api/auth/reset-password
+// @access  Public
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, newPassword, confirmPassword } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required.'
+      });
+    }
+
+    if (!otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code is required.'
+      });
+    }
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters.'
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Passwords do not match.'
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanOtp = String(otp).trim();
+
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Please enter a valid registered email address.'
+      });
+    }
+
+    if (
+      !user.resetPasswordOtp ||
+      user.resetPasswordOtp !== cleanOtp ||
+      !user.resetPasswordExpire ||
+      user.resetPasswordExpire < new Date()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset code.'
+      });
+    }
+
+    // Set new password (will be hashed automatically by pre-save hook)
+    user.password = newPassword;
+    user.resetPasswordOtp = null;
+    user.resetPasswordExpire = null;
+    await user.save();
+
+    await logActivity({
+      action: 'PASSWORD RESET COMPLETED',
+      user,
+      details: `User "${user.name}" (${user.email}) successfully reset their account password.`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset successfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};

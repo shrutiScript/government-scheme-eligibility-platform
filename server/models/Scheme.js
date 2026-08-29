@@ -73,9 +73,11 @@ const schemeSchema = new mongoose.Schema(
       noAgeLimit: { type: Boolean, default: false },
       minAge: { type: Number, default: null },
       maxAge: { type: Number, default: null },
-      gender: { type: String, default: 'All' },
-      maxIncome: { type: Number, default: 10000000 },
+      noIncomeLimit: { type: Boolean, default: false },
+      maxIncome: { type: Number, default: null },
+      maxAnnualIncome: { type: Number, default: null },
       minIncome: { type: Number, default: 0 },
+      gender: { type: String, default: 'All' },
       allowedStates: { type: [String], default: ['All'] },
       allowedOccupations: { type: [String], default: ['All'] },
       allowedEducations: { type: [String], default: ['All'] },
@@ -113,6 +115,16 @@ const schemeSchema = new mongoose.Schema(
     launchDate: {
       type: String,
       default: '2019-02-24'
+    },
+    lastDate: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    applicationLastDate: {
+      type: String,
+      default: '',
+      trim: true
     },
     tags: {
       type: [String],

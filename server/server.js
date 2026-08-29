@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import { seedSchemesIfEmpty } from './utils/seedSchemes.js';
 import { seedAdminUser } from './utils/seedAdmin.js';
+import { verifyEmailConnection } from './utils/emailService.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 import authRoutes from './routes/authRoutes.js';
@@ -72,6 +73,7 @@ const startServer = async () => {
     await connectDB();
     await seedAdminUser();
     await seedSchemesIfEmpty();
+    await verifyEmailConnection();
 
     const server = app.listen(PORT, () => {
       console.log(`===================================================`);
@@ -95,4 +97,8 @@ const startServer = async () => {
   }
 };
 
-startServer();
+export { app, startServer };
+
+if (process.argv[1] && process.argv[1].endsWith('server.js')) {
+  startServer();
+}

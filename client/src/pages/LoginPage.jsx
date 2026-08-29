@@ -134,12 +134,12 @@ export const LoginPage = () => {
                 />
                 <span>Remember me</span>
               </label>
-              <button
-                type="button"
+              <Link
+                to="/forgot-password"
                 className="text-xs font-bold text-slate-800 hover:underline cursor-pointer"
               >
                 Forgot password?
-              </button>
+              </Link>
             </div>
 
             {/* Submit Button */}

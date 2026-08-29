@@ -69,60 +69,159 @@ export const updateProfile = async (req, res, next) => {
       bplStatus
     } = req.body;
 
-    if (name !== undefined && typeof name === 'string' && name.trim()) {
-      user.name = name.trim();
+    const validationErrors = {};
+
+    // 1. Full Name Validation
+    let cleanName = user.name || '';
+    if (name !== undefined) {
+      cleanName = typeof name === 'string' ? name.trim() : '';
+      if (!cleanName) {
+        validationErrors.name = 'Please enter your full name.';
+      } else if (cleanName.length < 2 || !/^[a-zA-Z\s]+$/.test(cleanName)) {
+        validationErrors.name = 'Please enter a valid full name.';
+      }
+    } else if (!cleanName) {
+      validationErrors.name = 'Please enter your full name.';
     }
+
+    // 2. Mobile Number Validation
+    let cleanMobile = user.mobileNumber || user.phone || '';
     if (mobileNumber !== undefined) {
-      user.mobileNumber = typeof mobileNumber === 'string' ? mobileNumber.trim() : '';
-    }
-    
-    if (age !== undefined && age !== '' && age !== null) {
-      const parsedAge = Number(age);
-      if (isNaN(parsedAge) || !Number.isInteger(parsedAge) || parsedAge < 1 || parsedAge > 120) {
-        return res.status(400).json({
-          success: false,
-          message: 'Age must be a valid whole number between 1 and 120 years (cannot be 0 or negative).'
-        });
+      cleanMobile = typeof mobileNumber === 'string' ? mobileNumber.trim() : (mobileNumber !== null ? String(mobileNumber).trim() : '');
+      if (!cleanMobile) {
+        validationErrors.mobileNumber = 'Please enter a valid 10-digit mobile number.';
+      } else if (!/^[6-9]\d{9}$/.test(cleanMobile) && !/^\d{10}$/.test(cleanMobile)) {
+        validationErrors.mobileNumber = 'Please enter a valid 10-digit mobile number.';
       }
-      user.age = parsedAge;
+    } else if (!cleanMobile && !isFirstSave) {
+      validationErrors.mobileNumber = 'Please enter a valid 10-digit mobile number.';
     }
 
+    // 3. Age (Years) Validation
+    let finalAge = user.age;
+    if (age !== undefined) {
+      if (age === null || age === '') {
+        validationErrors.age = 'Age must be between 1 and 120 years.';
+      } else {
+        const parsedAge = Number(age);
+        if (isNaN(parsedAge) || !Number.isInteger(parsedAge) || parsedAge < 1 || parsedAge > 120) {
+          validationErrors.age = 'Age must be between 1 and 120 years.';
+        } else {
+          finalAge = parsedAge;
+        }
+      }
+    } else if (finalAge === undefined || finalAge === null) {
+      if (!isFirstSave) validationErrors.age = 'Age must be between 1 and 120 years.';
+    }
+
+    // 4. Gender Validation
+    const validGenders = ['Male', 'Female', 'Transgender', 'Other'];
+    let cleanGender = user.gender || '';
     if (gender !== undefined) {
-      user.gender = gender || '';
-    }
-    if (state !== undefined) {
-      user.state = typeof state === 'string' ? state.trim() : '';
-    }
-    if (city !== undefined) {
-      user.city = typeof city === 'string' ? city.trim() : '';
-    }
-    if (occupation !== undefined) {
-      user.occupation = typeof occupation === 'string' ? occupation.trim() : '';
-    }
-    if (education !== undefined) {
-      user.education = typeof education === 'string' ? education.trim() : '';
-    }
-
-    if (annualIncome !== undefined && annualIncome !== '' && annualIncome !== null) {
-      const parsedIncome = Number(annualIncome);
-      if (isNaN(parsedIncome) || parsedIncome < 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'Annual income cannot be a negative number.'
-        });
+      cleanGender = typeof gender === 'string' ? gender.trim() : '';
+      if (!cleanGender || !validGenders.includes(cleanGender)) {
+        validationErrors.gender = 'Please select your gender.';
       }
-      user.annualIncome = parsedIncome;
+    } else if (!cleanGender && !isFirstSave) {
+      validationErrors.gender = 'Please select your gender.';
     }
 
+    // 5. Annual Income Validation
+    let finalIncome = user.annualIncome;
+    if (annualIncome !== undefined) {
+      if (annualIncome === null || annualIncome === '') {
+        validationErrors.annualIncome = 'Please enter a valid annual income.';
+      } else {
+        const parsedIncome = Number(annualIncome);
+        if (isNaN(parsedIncome) || parsedIncome < 0) {
+          validationErrors.annualIncome = 'Please enter a valid annual income.';
+        } else {
+          finalIncome = parsedIncome;
+        }
+      }
+    } else if (finalIncome === undefined || finalIncome === null) {
+      if (!isFirstSave) validationErrors.annualIncome = 'Please enter a valid annual income.';
+    }
+
+    // 6. State of Residence Validation
+    let cleanState = user.state || '';
+    if (state !== undefined) {
+      cleanState = typeof state === 'string' ? state.trim() : '';
+      if (!cleanState || cleanState.toLowerCase() === 'all' || cleanState === 'Select State') {
+        validationErrors.state = 'Please select your state.';
+      }
+    } else if (!cleanState && !isFirstSave) {
+      validationErrors.state = 'Please select your state.';
+    }
+
+    // 7. City Validation
+    let cleanCity = user.city || '';
+    if (city !== undefined) {
+      cleanCity = typeof city === 'string' ? city.trim() : '';
+      if (!cleanCity || cleanCity === 'Select City' || cleanCity === 'Select State first') {
+        validationErrors.city = 'Please select your city.';
+      }
+    } else if (!cleanCity && !isFirstSave) {
+      validationErrors.city = 'Please select your city.';
+    }
+
+    // 8. Occupation Validation
+    let cleanOccupation = user.occupation || '';
+    if (occupation !== undefined) {
+      cleanOccupation = typeof occupation === 'string' ? occupation.trim() : '';
+      if (!cleanOccupation || cleanOccupation.toLowerCase() === 'all' || cleanOccupation === 'Select Occupation') {
+        validationErrors.occupation = 'Please select your occupation.';
+      }
+    } else if (!cleanOccupation && !isFirstSave) {
+      validationErrors.occupation = 'Please select your occupation.';
+    }
+
+    // 9. Education Level Validation
+    let cleanEducation = user.education || '';
+    if (education !== undefined) {
+      cleanEducation = typeof education === 'string' ? education.trim() : '';
+      if (!cleanEducation || cleanEducation.toLowerCase() === 'all' || cleanEducation === 'Select Education Level') {
+        validationErrors.education = 'Please select your education level.';
+      }
+    } else if (!cleanEducation && !isFirstSave) {
+      validationErrors.education = 'Please select your education level.';
+    }
+
+    // 10. Social Category / Caste Validation
+    let cleanCaste = user.caste || '';
     if (caste !== undefined) {
-      user.caste = typeof caste === 'string' ? caste.trim() : '';
+      cleanCaste = typeof caste === 'string' ? caste.trim() : '';
+      if (!cleanCaste || cleanCaste.toLowerCase() === 'all' || cleanCaste === 'Select Social Category') {
+        validationErrors.caste = 'Please select your social category.';
+      }
+    } else if (!cleanCaste && !isFirstSave) {
+      validationErrors.caste = 'Please select your social category.';
     }
-    if (disabilityStatus !== undefined) {
-      user.disabilityStatus = Boolean(disabilityStatus);
+
+    // If any validation errors exist, return 400 Bad Request with all error details
+    if (Object.keys(validationErrors).length > 0) {
+      const firstErrorMessage = Object.values(validationErrors)[0];
+      return res.status(400).json({
+        success: false,
+        message: firstErrorMessage,
+        errors: validationErrors
+      });
     }
-    if (bplStatus !== undefined) {
-      user.bplStatus = Boolean(bplStatus);
-    }
+
+    // Apply validated, sanitized and formatted values
+    user.name = cleanName;
+    user.mobileNumber = cleanMobile;
+    user.phone = cleanMobile; // Sync phone alias if used elsewhere
+    user.age = finalAge;
+    user.gender = cleanGender;
+    user.annualIncome = finalIncome;
+    user.state = cleanState;
+    user.city = cleanCity;
+    user.occupation = cleanOccupation;
+    user.education = cleanEducation;
+    user.caste = cleanCaste;
+    if (disabilityStatus !== undefined) user.disabilityStatus = Boolean(disabilityStatus);
+    if (bplStatus !== undefined) user.bplStatus = Boolean(bplStatus);
 
     const updatedUser = await user.save();
 
@@ -214,7 +313,24 @@ export const getSavedSchemes = async (req, res, next) => {
     }
 
     // Filter out entries where the scheme might have been deleted from DB
-    const validSavedSchemes = (user.savedSchemes || []).filter((item) => item.scheme !== null && item.scheme !== undefined);
+    const validSavedSchemes = (user.savedSchemes || []).filter(
+      (item) => item && item.scheme !== null && item.scheme !== undefined
+    );
+
+    // If any deleted schemes were detected, permanently prune them from the user's document in MongoDB
+    if (user.savedSchemes && validSavedSchemes.length !== user.savedSchemes.length) {
+      await User.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            savedSchemes: validSavedSchemes.map((item) => ({
+              scheme: item.scheme._id || item.scheme,
+              savedAt: item.savedAt || new Date()
+            }))
+          }
+        }
+      );
+    }
 
     // Return in reverse chronological order (newest saved first)
     validSavedSchemes.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
@@ -256,10 +372,12 @@ export const saveScheme = async (req, res, next) => {
       user.savedSchemes = [];
     }
 
-    // Check if already saved
-    const alreadySaved = user.savedSchemes.some(
-      (item) => item.scheme && item.scheme.toString() === schemeId
-    );
+    // Check if already saved (supporting ObjectId, string, or object)
+    const alreadySaved = user.savedSchemes.some((item) => {
+      if (!item || !item.scheme) return false;
+      const currentId = item.scheme._id ? item.scheme._id.toString() : item.scheme.toString();
+      return currentId === schemeId.toString();
+    });
 
     if (!alreadySaved) {
       user.savedSchemes.push({
@@ -278,7 +396,9 @@ export const saveScheme = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: 'Scheme saved successfully',
-      isSaved: true
+      isSaved: true,
+      savedSchemes: user.savedSchemes,
+      user: user.toJSON()
     });
   } catch (error) {
     next(error);
@@ -304,16 +424,21 @@ export const removeSavedScheme = async (req, res, next) => {
       user.savedSchemes = [];
     }
 
-    user.savedSchemes = user.savedSchemes.filter(
-      (item) => item.scheme && item.scheme.toString() !== schemeId
-    );
+    // Permanently filter out the scheme by comparing string IDs
+    user.savedSchemes = user.savedSchemes.filter((item) => {
+      if (!item || !item.scheme) return false;
+      const currentId = item.scheme._id ? item.scheme._id.toString() : item.scheme.toString();
+      return currentId !== schemeId.toString();
+    });
 
     await user.save();
 
     return res.status(200).json({
       success: true,
       message: 'Scheme removed from saved list',
-      isSaved: false
+      isSaved: false,
+      savedSchemes: user.savedSchemes,
+      user: user.toJSON()
     });
   } catch (error) {
     next(error);

@@ -52,6 +52,22 @@ export const SchemeViewModal = ({ isOpen, onClose, scheme, onEdit }) => {
       ? scheme.benefits.split('\n').filter(Boolean)
       : [];
 
+  const isNoAge = Boolean(
+    scheme.eligibilityCriteria?.noAgeLimit ||
+    scheme.eligibility?.noAgeLimit ||
+    (scheme.eligibilityCriteria?.minAge === null && scheme.eligibilityCriteria?.maxAge === null) ||
+    (scheme.eligibility?.minAge === null && scheme.eligibility?.maxAge === null)
+  );
+
+  const isNoIncome = Boolean(
+    scheme.eligibilityCriteria?.noIncomeLimit ||
+    scheme.eligibility?.noIncomeLimit ||
+    scheme.eligibilityCriteria?.maxIncome === null ||
+    scheme.eligibility?.maxIncome === null ||
+    scheme.eligibilityCriteria?.maxAnnualIncome === null ||
+    scheme.eligibility?.maxAnnualIncome === null
+  );
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Government Scheme Comprehensive Audit View" maxWidth="max-w-3xl">
       <div className="space-y-6 text-slate-800 text-xs">
@@ -85,6 +101,17 @@ export const SchemeViewModal = ({ isOpen, onClose, scheme, onEdit }) => {
                 <div className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
                   <span>Launched: {scheme.launchDate}</span>
+                </div>
+              )}
+              {(scheme.lastDate || scheme.applicationLastDate) ? (
+                <div className={`flex items-center gap-1 font-bold ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200' : 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200'}`}>
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Last Date: {scheme.lastDate || scheme.applicationLastDate} {new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? '(Expired)' : ''}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-slate-500 font-medium">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Last Date: No Expiry (Ongoing)</span>
                 </div>
               )}
               {scheme.viewCount !== undefined && (
@@ -135,14 +162,14 @@ export const SchemeViewModal = ({ isOpen, onClose, scheme, onEdit }) => {
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Max Annual Income</span>
               <p className="font-black text-slate-900 text-sm">
-                ₹{incomeCeiling.toLocaleString('en-IN')} / yr
+                {isNoIncome ? 'No Income Limit' : `₹${incomeCeiling.toLocaleString('en-IN')} / yr`}
               </p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Eligible Age Range</span>
               <p className="font-black text-slate-900 text-sm">
-                {minAge} - {maxAge} yrs
+                {isNoAge ? 'No Age Limit' : `${minAge} - ${maxAge} yrs`}
               </p>
             </div>
 

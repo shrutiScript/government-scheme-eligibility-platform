@@ -31,7 +31,7 @@ const CATEGORY_META = {
 };
 
 export const YourSchemesPage = () => {
-  const { user } = useAuth();
+  const { user, updateUserState, updateSavedSchemes } = useAuth();
   const userId = user?._id || user?.id;
   const { notifySuccess, notifyError } = useNotification();
   const [savedItems, setSavedItems] = useState([]);
@@ -65,16 +65,21 @@ export const YourSchemesPage = () => {
     setRemovingId(schemeId);
     try {
       const res = await userService.removeSavedScheme(schemeId);
-      if (res.success) {
+      if (res?.success) {
         setSavedItems((prev) => prev.filter((item) => {
           const id = item.scheme?._id || item.scheme;
-          return id !== schemeId;
+          return id?.toString() !== schemeId?.toString();
         }));
+        if (res.user) {
+          updateUserState(res.user);
+        } else if (res.savedSchemes) {
+          updateSavedSchemes(res.savedSchemes);
+        }
         notifySuccess(`"${schemeTitle}" removed from Your Schemes`);
       }
     } catch (err) {
       console.error('Failed to remove saved scheme:', err);
-      notifyError('Failed to remove scheme. Please try again.');
+      notifyError(err?.response?.data?.message || err?.message || 'Failed to remove scheme. Please try again.');
     } finally {
       setRemovingId(null);
     }

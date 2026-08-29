@@ -10,7 +10,7 @@ const api = axios.create({
 const getStorageItem = (key) => {
   if (typeof window === 'undefined') return null;
   try {
-    return sessionStorage.getItem(key) || localStorage.getItem(key);
+    return sessionStorage.getItem(key);
   } catch {
     return null;
   }
@@ -18,7 +18,7 @@ const getStorageItem = (key) => {
 
 /**
  * Dynamic Bearer token retriever
- * Tab-isolated with sessionStorage priority and localStorage fallback.
+ * Strictly tab-isolated using current tab's sessionStorage.
  */
 export const getActiveToken = (roleContext = null, url = '', method = 'GET') => {
   const adminToken = getStorageItem('gov_admin_token');
@@ -109,8 +109,6 @@ api.interceptors.response.use(
         try {
           sessionStorage.removeItem('gov_admin_token');
           sessionStorage.removeItem('gov_admin_user');
-          localStorage.removeItem('gov_admin_token');
-          localStorage.removeItem('gov_admin_user');
         } catch {}
       } else {
         try {
@@ -118,25 +116,17 @@ api.interceptors.response.use(
           sessionStorage.removeItem('gov_token');
           sessionStorage.removeItem('gov_citizen_user');
           sessionStorage.removeItem('gov_user');
-          localStorage.removeItem('gov_user_token');
-          localStorage.removeItem('gov_token');
-          localStorage.removeItem('gov_citizen_user');
-          localStorage.removeItem('gov_user');
         } catch {}
       }
     }
 
-    // 403 Forbidden: Blocked citizen account -> clean up citizen token and redirect
+    // 403 Forbidden: Blocked citizen account -> clean up current tab's citizen token and redirect
     if (status === 403 && isBlocked) {
       try {
         sessionStorage.removeItem('gov_user_token');
         sessionStorage.removeItem('gov_token');
         sessionStorage.removeItem('gov_citizen_user');
         sessionStorage.removeItem('gov_user');
-        localStorage.removeItem('gov_user_token');
-        localStorage.removeItem('gov_token');
-        localStorage.removeItem('gov_citizen_user');
-        localStorage.removeItem('gov_user');
       } catch {}
 
       if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin') && !window.location.pathname.startsWith('/login')) {

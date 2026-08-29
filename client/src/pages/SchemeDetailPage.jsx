@@ -271,6 +271,11 @@ export const SchemeDetailPage = () => {
                 ● {scheme.status}
               </span>
             )}
+            {(scheme.lastDate || scheme.applicationLastDate) && new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) && (
+              <span className="px-3 py-1 rounded-lg bg-rose-50 border border-rose-200 text-xs font-extrabold text-rose-700 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-rose-600" /> Application Deadline Expired
+              </span>
+            )}
           </div>
 
           {matchResult && (
@@ -295,7 +300,7 @@ export const SchemeDetailPage = () => {
         </p>
 
         {/* Key Info Chips */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 items-start">
           {scheme.benefitAmount && (
             <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -320,6 +325,22 @@ export const SchemeDetailPage = () => {
               <div className="flex-1 min-w-0">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block mb-0.5">Launch Date</span>
                 <span className="text-xs font-extrabold text-amber-900 leading-snug block">{scheme.launchDate}</span>
+              </div>
+            </div>
+          )}
+
+          {(scheme.lastDate || scheme.applicationLastDate) && (
+            <div className={`p-3.5 rounded-2xl border flex items-start gap-3 ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'bg-rose-50/80 border-rose-200/80' : 'bg-blue-50/80 border-blue-200/80'}`}>
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-800'}`}>
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className={`text-[10px] font-bold uppercase tracking-wider block mb-0.5 ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'text-rose-800' : 'text-blue-800'}`}>
+                  Last Date
+                </span>
+                <span className={`text-xs font-extrabold leading-snug block ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'text-rose-900' : 'text-blue-900'}`}>
+                  {scheme.lastDate || scheme.applicationLastDate} {new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? '(Expired)' : ''}
+                </span>
               </div>
             </div>
           )}
@@ -486,7 +507,9 @@ export const SchemeDetailPage = () => {
                   <span>Age Limit</span>
                 </div>
                 <span className="font-extrabold text-slate-900 bg-slate-100 px-3 py-1 rounded-xl text-xs">
-                  {criteria.minAge ?? 0} – {criteria.maxAge ?? 120} Years
+                  {criteria.noAgeLimit || (criteria.minAge === null && criteria.maxAge === null)
+                    ? 'No Age Limit'
+                    : `${criteria.minAge ?? 1} – ${criteria.maxAge ?? 120} Years`}
                 </span>
               </div>
 
@@ -497,7 +520,9 @@ export const SchemeDetailPage = () => {
                   <span>Max Annual Income</span>
                 </div>
                 <span className="font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-xl text-xs">
-                  ₹{(criteria.maxIncome ?? 10000000).toLocaleString('en-IN')} / Yr
+                  {criteria.noIncomeLimit || criteria.maxIncome === null || criteria.maxAnnualIncome === null
+                    ? 'No Income Limit'
+                    : `₹${(criteria.maxIncome ?? criteria.maxAnnualIncome ?? 0).toLocaleString('en-IN')} / Yr`}
                 </span>
               </div>
 

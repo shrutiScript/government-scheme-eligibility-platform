@@ -52,11 +52,16 @@ export const evaluateSchemeEligibility = (scheme, profile = {}) => {
   let score = 100;
 
   // 1. Age Check (Ignore age completely if "No Age Limit")
-  const minAge = criteria.minAge !== undefined && criteria.minAge !== null ? Number(criteria.minAge) : 0;
-  const maxAge = criteria.maxAge !== undefined && criteria.maxAge !== null ? Number(criteria.maxAge) : 120;
-  const isNoAgeLimit = (minAge <= 0 && maxAge >= 100) || criteria.noAgeLimit === true || criteria.ageLimit === 'No Age Limit';
+  const isNoAgeLimit = Boolean(
+    criteria.noAgeLimit === true ||
+    criteria.ageLimit === 'No Age Limit' ||
+    (criteria.minAge === null && criteria.maxAge === null)
+  );
 
-  if (!isNoAgeLimit && (minAge > 0 || maxAge < 100)) {
+  if (!isNoAgeLimit) {
+    const minAge = criteria.minAge !== undefined && criteria.minAge !== null ? Number(criteria.minAge) : 1;
+    const maxAge = criteria.maxAge !== undefined && criteria.maxAge !== null ? Number(criteria.maxAge) : 120;
+
     if (profile.age !== undefined && profile.age !== null && profile.age !== '') {
       const userAge = Number(profile.age);
       if (!isNaN(userAge)) {
@@ -64,12 +69,12 @@ export const evaluateSchemeEligibility = (scheme, profile = {}) => {
           reasonsNotEligible.push(`Minimum required age is ${minAge} years (Your age: ${userAge})`);
           score -= 25;
         }
-        if (maxAge > 0 && maxAge < 100 && userAge > maxAge) {
+        if (maxAge > 0 && maxAge <= 120 && userAge > maxAge) {
           reasonsNotEligible.push(`Maximum allowed age is ${maxAge} years (Your age: ${userAge})`);
           score -= 25;
         }
-        if ((minAge <= 0 || userAge >= minAge) && (maxAge >= 100 || userAge <= maxAge)) {
-          qualifyingFactors.push(`Age (${userAge} yrs) satisfies age requirements (${minAge > 0 ? minAge : 0}–${maxAge < 100 ? maxAge : 'No Limit'})`);
+        if (userAge >= minAge && userAge <= maxAge) {
+          qualifyingFactors.push(`Age (${userAge} yrs) satisfies age requirements (${minAge}–${maxAge} yrs)`);
         }
       }
     }
@@ -95,24 +100,35 @@ export const evaluateSchemeEligibility = (scheme, profile = {}) => {
   }
 
   // 3. Annual Income Check
-  const maxIncome = criteria.maxIncome !== undefined && criteria.maxIncome !== null ? Number(criteria.maxIncome) : 10000000;
-  const minIncome = criteria.minIncome !== undefined && criteria.minIncome !== null ? Number(criteria.minIncome) : 0;
+  const isNoIncomeLimit = Boolean(
+    criteria.noIncomeLimit === true ||
+    criteria.incomeLimit === 'No Income Limit' ||
+    criteria.maxIncome === null ||
+    criteria.maxAnnualIncome === null
+  );
 
-  if (profile.annualIncome !== undefined && profile.annualIncome !== null && profile.annualIncome !== '') {
-    const userIncome = Number(profile.annualIncome);
-    if (!isNaN(userIncome)) {
-      if (maxIncome > 0 && maxIncome < 10000000 && userIncome > maxIncome) {
-        reasonsNotEligible.push(`Annual income ceiling is ₹${maxIncome.toLocaleString('en-IN')} (Your income: ₹${userIncome.toLocaleString('en-IN')})`);
-        score -= 30;
-      } else if (maxIncome > 0 && maxIncome < 10000000) {
-        qualifyingFactors.push(`Income (₹${userIncome.toLocaleString('en-IN')}) is within limit of ₹${maxIncome.toLocaleString('en-IN')}`);
-      }
+  if (!isNoIncomeLimit) {
+    const maxIncome = criteria.maxIncome !== undefined && criteria.maxIncome !== null ? Number(criteria.maxIncome) : (criteria.maxAnnualIncome !== undefined && criteria.maxAnnualIncome !== null ? Number(criteria.maxAnnualIncome) : null);
+    const minIncome = criteria.minIncome !== undefined && criteria.minIncome !== null ? Number(criteria.minIncome) : 0;
 
-      if (minIncome > 0 && userIncome < minIncome) {
-        reasonsNotEligible.push(`Minimum annual income requirement is ₹${minIncome.toLocaleString('en-IN')}`);
-        score -= 20;
+    if (maxIncome !== null && profile.annualIncome !== undefined && profile.annualIncome !== null && profile.annualIncome !== '') {
+      const userIncome = Number(profile.annualIncome);
+      if (!isNaN(userIncome)) {
+        if (maxIncome > 0 && userIncome > maxIncome) {
+          reasonsNotEligible.push(`Annual income ceiling is ₹${maxIncome.toLocaleString('en-IN')} (Your income: ₹${userIncome.toLocaleString('en-IN')})`);
+          score -= 30;
+        } else if (maxIncome > 0) {
+          qualifyingFactors.push(`Income (₹${userIncome.toLocaleString('en-IN')}) is within limit of ₹${maxIncome.toLocaleString('en-IN')}`);
+        }
+
+        if (minIncome > 0 && userIncome < minIncome) {
+          reasonsNotEligible.push(`Minimum annual income requirement is ₹${minIncome.toLocaleString('en-IN')}`);
+          score -= 20;
+        }
       }
     }
+  } else {
+    qualifyingFactors.push('No income limit on this scheme');
   }
 
   // 4. State & City Check

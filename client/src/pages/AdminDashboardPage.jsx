@@ -56,7 +56,8 @@ import {
   Folder,
   LogOut,
   Sliders,
-  Plus
+  Plus,
+  X
 } from 'lucide-react';
 
 import { SCHEME_CATEGORIES } from '../utils/constants';
@@ -134,6 +135,16 @@ export const AdminDashboardPage = () => {
   const [sortField, setSortField] = useState('title');
   const [sortOrder, setSortOrder] = useState('asc');
 
+  // Handle clicking on any Scheme Distribution slice, legend item, or tooltip
+  const handleSelectCategoryFromDistribution = (categoryName) => {
+    if (!categoryName) return;
+    setSchemeCategory(categoryName);
+    setShowMoreFilters(true);
+    setSchemePage(1);
+    setActiveTab('schemes');
+    notifySuccess(`Filtering Scheme Management by category: "${categoryName}"`);
+  };
+
   // Users List State
   const [users, setUsers] = useState([]);
   const [userSearch, setUserSearch] = useState('');
@@ -153,6 +164,7 @@ export const AdminDashboardPage = () => {
   // Chart Interactive Tooltip States
   const [hoveredLineNode, setHoveredLineNode] = useState(null);
   const [hoveredDonutSlice, setHoveredDonutSlice] = useState(null);
+  const [donutTooltipPos, setDonutTooltipPos] = useState({ x: 0, y: 0 });
 
   // Modals & Dialogs State
   const [schemeModalOpen, setSchemeModalOpen] = useState(false);
@@ -449,7 +461,7 @@ export const AdminDashboardPage = () => {
         // Create New Scheme
         const res = await schemeService.createScheme(schemeData);
         if (res.success) {
-          notifySuccess('Scheme created successfully.');
+          notifySuccess('Scheme published successfully.');
           setSchemeModalOpen(false);
           setSelectedScheme(null);
           fetchSchemes();
@@ -501,22 +513,31 @@ export const AdminDashboardPage = () => {
     try {
       if (deleteItemType === 'scheme') {
         const res = await schemeService.deleteScheme(deleteItemId);
-        if (res.success) {
-          notifySuccess(`Scheme "${deleteItemTitle}" deleted successfully!`);
+        if (res?.success) {
+          setSchemes((prev) => prev.filter((s) => (s._id || s.id) !== deleteItemId));
+          notifySuccess(res.message || `Scheme "${deleteItemTitle}" deleted successfully!`);
           fetchSchemes();
           fetchStats();
+          fetchLogs();
         }
       } else if (deleteItemType === 'user') {
         const res = await adminService.deleteUser(deleteItemId);
-        if (res.success) {
-          notifySuccess(`User account deleted successfully!`);
+        if (res?.success) {
+          setUsers((prev) => prev.filter((u) => (u._id || u.id) !== deleteItemId));
+          notifySuccess(res.message || `User account deleted successfully!`);
           fetchUsers();
           fetchStats();
+          fetchLogs();
         }
       }
       setConfirmModalOpen(false);
     } catch (error) {
       notifyError(error.message || 'Deletion failed');
+      if (deleteItemType === 'scheme') {
+        fetchSchemes();
+      } else if (deleteItemType === 'user') {
+        fetchUsers();
+      }
     } finally {
       setSubmitting(false);
     }
@@ -579,11 +600,6 @@ export const AdminDashboardPage = () => {
       if (res.success) {
         if (res.user.isBlocked) {
           notifySuccess(`User '${userItem.name}' has been blocked successfully.`);
-          try {
-            const channel = new BroadcastChannel('gov_scheme_auth_channel');
-            channel.postMessage({ type: 'USER_BLOCKED', userId: userItem._id });
-            channel.close();
-          } catch (e) { }
         } else {
           notifySuccess(`User '${userItem.name}' has been unblocked successfully.`);
         }
@@ -850,8 +866,10 @@ export const AdminDashboardPage = () => {
                     const count = item.total || 0;
                     const pct = Math.max(1, Math.round((count / totalInDist) * 100));
                     return {
-                      label: item._id || 'Uncategorized',
+                      label: item._id || 'General Welfare',
                       count,
+                      activeCount: item.active !== undefined ? item.active : count,
+                      inactiveCount: item.inactive !== undefined ? item.inactive : 0,
                       pct,
                       color: CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length]
                     };
@@ -859,7 +877,7 @@ export const AdminDashboardPage = () => {
                 } else if (Array.isArray(schemes) && schemes.length > 0) {
                   const countsMap = {};
                   schemes.forEach((s) => {
-                    const cat = s.category || 'General';
+                    const cat = s.category || 'General Welfare';
                     countsMap[cat] = (countsMap[cat] || 0) + 1;
                   });
                   const totalInDist = schemes.length || 1;
@@ -870,29 +888,55 @@ export const AdminDashboardPage = () => {
                     return {
                       label: k,
                       count,
+                      activeCount: count,
+                      inactiveCount: 0,
                       pct,
                       color: CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length]
                     };
                   });
                 } else {
                   catSlices = [
-                    { label: 'Agriculture', count: 4, pct: 34, color: '#0f4c5c' },
-                    { label: 'Public Services', count: 3, pct: 25, color: '#06b6d4' },
-                    { label: 'Education', count: 2, pct: 17, color: '#0f172a' },
-                    { label: 'Financial Services', count: 2, pct: 16, color: '#3b82f6' },
-                    { label: 'Healthcare', count: 1, pct: 8, color: '#8b5cf6' }
+                    { label: 'Agriculture & Farmers', count: 4, activeCount: 4, inactiveCount: 0, pct: 34, color: '#0f4c5c' },
+                    { label: 'Education & Scholarships', count: 3, activeCount: 3, inactiveCount: 0, pct: 25, color: '#06b6d4' },
+                    { label: 'Employment & Skill Development', count: 2, activeCount: 2, inactiveCount: 0, pct: 17, color: '#0f172a' },
+                    { label: 'Financial Inclusion & Business', count: 2, activeCount: 2, inactiveCount: 0, pct: 16, color: '#3b82f6' },
+                    { label: 'Healthcare & Health Insurance', count: 1, activeCount: 1, inactiveCount: 0, pct: 8, color: '#8b5cf6' }
                   ];
                 }
 
                 // Normalize percentages to sum to exactly 100%
-                const sumPct = catSlices.reduce((acc, s) => acc + s.pct, 0);
-                if (sumPct !== 100 && catSlices.length > 0) {
-                  catSlices[0].pct += 100 - sumPct;
+                if (catSlices.length > 0) {
+                  const sumPct = catSlices.reduce((acc, s) => acc + s.pct, 0);
+                  if (sumPct !== 100) {
+                    catSlices[0].pct += 100 - sumPct;
+                  }
                 }
 
                 const totalSchemesInDonut = catSlices.reduce((acc, s) => acc + s.count, 0);
-                const circumference = 427.25;
-                let offsetAccumulator = 0;
+                const circumference = 427.256; // 2 * PI * 68
+
+                // Precompute SVG stroke offsets and arc center points for natural tooltip tracking
+                let currentAcc = 0;
+                const processedCatSlices = catSlices.map((slice) => {
+                  const sliceLength = (slice.pct / 100) * circumference;
+                  const strokeSpace = Math.max(0, circumference - sliceLength);
+                  const offset = currentAcc;
+                  const startAngle = (currentAcc / circumference) * 360;
+                  const angleSpan = (sliceLength / circumference) * 360;
+                  const midAngle = startAngle + angleSpan / 2;
+                  const angleRad = ((midAngle - 90) * Math.PI) / 180;
+                  const arcX = 96 + 68 * (192 / 180) * Math.cos(angleRad);
+                  const arcY = 96 + 68 * (192 / 180) * Math.sin(angleRad);
+                  currentAcc += sliceLength;
+                  return {
+                    ...slice,
+                    sliceLength,
+                    strokeSpace,
+                    offset,
+                    arcX,
+                    arcY
+                  };
+                });
 
                 return (
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
@@ -1068,7 +1112,7 @@ export const AdminDashboardPage = () => {
                     </div>
 
                     {/* Right 40% (5 cols): Scheme Distribution Donut Chart with Dynamic Database Categories */}
-                    <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 flex flex-col justify-between space-y-4 relative overflow-hidden">
+                    <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6 flex flex-col justify-between space-y-4 relative overflow-visible">
                       <div className="flex items-center justify-between">
                         <div>
                           <h3 className="text-base font-bold text-slate-900 tracking-tight">
@@ -1076,51 +1120,137 @@ export const AdminDashboardPage = () => {
                           </h3>
                           <p className="text-xs text-slate-400 font-medium">Published records by category</p>
                         </div>
-                        <div className="text-slate-400 hover:text-slate-700 cursor-pointer p-1">
-                          <span className="text-sm font-bold">⋮</span>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSchemeCategory('All');
+                            setShowMoreFilters(false);
+                            setSchemePage(1);
+                            setActiveTab('schemes');
+                          }}
+                          className="text-xs font-bold text-[#0052cc] hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+                          title="Manage All Schemes"
+                        >
+                          <span>Manage All</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </button>
                       </div>
 
                       <div className="flex flex-col items-center justify-center space-y-4">
-                        {/* Circular Donut Ring Graphic with Dynamic Center Metric */}
-                        <div className="relative w-44 h-44 flex items-center justify-center">
+                        {/* Circular Donut Ring Graphic with Interactive Floating Hover Tooltip & Clickable Slices */}
+                        <div
+                          className="relative w-48 h-48 flex items-center justify-center overflow-visible"
+                          onMouseMove={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            setDonutTooltipPos({
+                              x: e.clientX - rect.left,
+                              y: e.clientY - rect.top
+                            });
+                          }}
+                          onMouseLeave={() => setHoveredDonutSlice(null)}
+                        >
                           <svg
-                            className="w-full h-full -rotate-90"
+                            className="w-full h-full -rotate-90 pointer-events-auto"
                             viewBox="0 0 180 180"
-                            onMouseLeave={() => setHoveredDonutSlice(null)}
                           >
-                            {catSlices.map((slice, idx) => {
-                              const sliceLength = (slice.pct / 100) * circumference;
-                              const strokeSpace = circumference - sliceLength;
-                              const currentOffset = offsetAccumulator;
-                              offsetAccumulator += sliceLength;
-
+                            {processedCatSlices.map((slice, idx) => {
                               const isHovered = hoveredDonutSlice?.label === slice.label;
 
                               return (
                                 <circle
-                                  key={idx}
+                                  key={slice.label + idx}
                                   cx="90"
                                   cy="90"
                                   r="68"
                                   fill="transparent"
                                   stroke={slice.color}
                                   strokeWidth={isHovered ? '28' : '22'}
-                                  strokeDasharray={`${sliceLength} ${strokeSpace}`}
-                                  strokeDashoffset={-currentOffset}
-                                  opacity={hoveredDonutSlice && !isHovered ? '0.55' : '1'}
-                                  onMouseEnter={() => setHoveredDonutSlice(slice)}
-                                  onClick={() => setHoveredDonutSlice(slice)}
-                                  className="transition-all duration-300 cursor-pointer"
+                                  strokeDasharray={`${slice.sliceLength} ${slice.strokeSpace}`}
+                                  strokeDashoffset={-slice.offset}
+                                  opacity={hoveredDonutSlice && !isHovered ? '0.5' : '1'}
+                                  onMouseEnter={(e) => {
+                                    setHoveredDonutSlice(slice);
+                                    const container = e.currentTarget.closest('.relative');
+                                    if (container) {
+                                      const rect = container.getBoundingClientRect();
+                                      setDonutTooltipPos({
+                                        x: e.clientX - rect.left,
+                                        y: e.clientY - rect.top
+                                      });
+                                    }
+                                  }}
+                                  onMouseMove={(e) => {
+                                    const container = e.currentTarget.closest('.relative');
+                                    if (container) {
+                                      const rect = container.getBoundingClientRect();
+                                      setDonutTooltipPos({
+                                        x: e.clientX - rect.left,
+                                        y: e.clientY - rect.top
+                                      });
+                                    }
+                                  }}
+                                  onClick={() => handleSelectCategoryFromDistribution(slice.label)}
+                                  className="transition-all duration-300 cursor-pointer pointer-events-auto"
                                 />
                               );
                             })}
                           </svg>
 
-                          {/* Interactive Center Donut Badge */}
-                          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none transition-all duration-200">
+                          {/* Floating Interactive Hover Tooltip for Scheme Distribution ONLY */}
+                          {hoveredDonutSlice && (
+                            <div
+                              className="absolute z-50 pointer-events-none transition-all duration-75 ease-out transform -translate-x-1/2 -translate-y-full mb-3"
+                              style={{
+                                left: `${donutTooltipPos.x !== undefined && donutTooltipPos.x > 0 ? Math.max(20, Math.min(172, donutTooltipPos.x)) : (hoveredDonutSlice.arcX || 96)}px`,
+                                top: `${donutTooltipPos.y !== undefined && donutTooltipPos.y > 0 ? Math.max(10, Math.min(185, donutTooltipPos.y - 10)) : ((hoveredDonutSlice.arcY || 96) - 10)}px`
+                              }}
+                            >
+                              <div className="bg-[#0b1f33]/95 backdrop-blur-md text-white px-3.5 py-2.5 rounded-xl shadow-2xl border border-slate-700/80 min-w-[170px] space-y-1.5 animate-fade-in text-left">
+                                <div className="flex items-center gap-2 border-b border-slate-700/60 pb-1.5">
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
+                                    style={{ backgroundColor: hoveredDonutSlice.color }}
+                                  />
+                                  <span className="text-[11px] font-bold text-white tracking-wide truncate max-w-[130px]">
+                                    {hoveredDonutSlice.label}
+                                  </span>
+                                </div>
+                                <div className="space-y-1 text-xs font-medium text-slate-200">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <span className="text-slate-400">Category:</span>
+                                    <span className="font-bold text-slate-100 truncate max-w-[100px]">{hoveredDonutSlice.label}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-3">
+                                    <span className="text-slate-400">Total Schemes:</span>
+                                    <span className="font-extrabold text-amber-300">{hoveredDonutSlice.count}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-3">
+                                    <span className="text-slate-400">Percentage:</span>
+                                    <span className="font-extrabold text-emerald-400">{hoveredDonutSlice.pct}%</span>
+                                  </div>
+                                </div>
+                                <div className="absolute left-1/2 -bottom-1 -translate-x-1/2 w-2 h-2 bg-[#0b1f33] rotate-45 border-r border-b border-slate-700/80" />
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Interactive Center Donut Badge (Click to Action) */}
+                          <div
+                            onClick={() => {
+                              if (hoveredDonutSlice) {
+                                handleSelectCategoryFromDistribution(hoveredDonutSlice.label);
+                              } else {
+                                setSchemeCategory('All');
+                                setShowMoreFilters(false);
+                                setSchemePage(1);
+                                setActiveTab('schemes');
+                              }
+                            }}
+                            className="absolute w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all duration-200 group z-10"
+                            title={hoveredDonutSlice ? `Click to view ${hoveredDonutSlice.label} schemes` : 'Click to manage all schemes'}
+                          >
                             {hoveredDonutSlice ? (
-                              <div className="text-center animate-fade-in space-y-0.5">
+                              <div className="text-center animate-fade-in space-y-0.5 pointer-events-none">
                                 <span
                                   className="text-2xl font-black leading-none block"
                                   style={{ color: hoveredDonutSlice.color }}
@@ -1130,58 +1260,73 @@ export const AdminDashboardPage = () => {
                                 <span className="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider block">
                                   {hoveredDonutSlice.count} SCHEMES
                                 </span>
+                                <span className="text-[9px] font-bold text-blue-600 group-hover:underline block">
+                                  View Schemes →
+                                </span>
                               </div>
                             ) : (
-                              <div className="text-center space-y-0.5">
+                              <div className="text-center space-y-0.5 pointer-events-none">
                                 <span className="text-2xl font-black text-slate-900 leading-none block">
                                   {totalSchemesInDonut}
                                 </span>
                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                                  SCHEMES
+                                  TOTAL SCHEMES
+                                </span>
+                                <span className="text-[9px] font-bold text-slate-400 group-hover:text-blue-600 block">
+                                  Manage All →
                                 </span>
                               </div>
                             )}
                           </div>
                         </div>
 
-                        {/* Interactive Tooltip Card / Guidance Bar */}
+                        {/* Interactive Tooltip Card / Action Bar */}
                         {hoveredDonutSlice ? (
-                          <div className="bg-[#0b1f33] text-white px-3.5 py-1.5 rounded-xl shadow-md border border-slate-700/80 flex items-center justify-between gap-3 text-xs font-bold animate-fade-in w-full">
-                            <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleSelectCategoryFromDistribution(hoveredDonutSlice.label)}
+                            className="bg-[#0b1f33] hover:bg-[#133353] text-white px-3.5 py-2 rounded-xl shadow-md border border-slate-700/80 flex items-center justify-between gap-3 text-xs font-bold animate-fade-in w-full cursor-pointer transition-colors group"
+                            title={`Filter schemes by ${hoveredDonutSlice.label}`}
+                          >
+                            <div className="flex items-center gap-2 truncate">
                               <span
                                 className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
                                 style={{ backgroundColor: hoveredDonutSlice.color }}
                               />
-                              <span className="text-slate-100">{hoveredDonutSlice.label}</span>
+                              <span className="text-slate-100 truncate">{hoveredDonutSlice.label}</span>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 shrink-0">
                               <span className="text-amber-300 font-extrabold">{hoveredDonutSlice.count} schemes</span>
                               <span className="text-[10px] text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-500/30 font-black">
                                 {hoveredDonutSlice.pct}%
                               </span>
+                              <span className="text-[10px] text-sky-300 group-hover:translate-x-0.5 transition-transform">
+                                Filter →
+                              </span>
                             </div>
-                          </div>
+                          </button>
                         ) : (
                           <div className="text-[11px] text-slate-400 font-medium text-center italic py-1">
-                            Hover over segments to inspect category metrics
+                            Hover over any segment to view detailed category breakdown
                           </div>
                         )}
 
-                        {/* Clean Legend - Dynamically Renders Every Category */}
+                        {/* Clean Legend - Dynamically Renders Every Category with Direct Filter Action */}
                         <div className="flex items-center justify-center gap-3 flex-wrap text-xs font-medium text-slate-600 max-h-24 overflow-y-auto px-2">
-                          {catSlices.map((slice, i) => {
+                          {processedCatSlices.map((slice, i) => {
                             const isHovered = hoveredDonutSlice?.label === slice.label;
                             return (
                               <div
-                                key={i}
-                                onMouseEnter={() => setHoveredDonutSlice(slice)}
-                                onMouseLeave={() => setHoveredDonutSlice(null)}
-                                onClick={() => {
-                                  setSchemeCategory(slice.label);
-                                  setActiveTab('schemes');
+                                key={slice.label + i}
+                                onMouseEnter={(e) => {
+                                  setHoveredDonutSlice(slice);
+                                  setDonutTooltipPos({ x: slice.arcX || 96, y: slice.arcY || 96 });
                                 }}
+                                onMouseLeave={() => setHoveredDonutSlice(null)}
+                                onClick={() => handleSelectCategoryFromDistribution(slice.label)}
                                 className={`flex items-center gap-1.5 cursor-pointer transition-all ${isHovered ? 'text-slate-950 font-bold scale-105' : 'hover:text-slate-900'
                                   }`}
+                                title={`Click to view ${slice.label} schemes`}
                               >
                                 <span
                                   className="w-2 h-2 rounded-full shrink-0 transition-transform"
@@ -1429,6 +1574,73 @@ export const AdminDashboardPage = () => {
                   </div>
                 </div>
 
+                {/* Active Category / Filter Tags */}
+                {(schemeCategory !== 'All' || schemeStatus !== 'all' || schemeSearch) && (
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 text-xs">
+                    <span className="text-slate-400 font-semibold">Active filters:</span>
+                    {schemeCategory !== 'All' && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-[#0052cc] border border-blue-200 font-bold">
+                        <span>Category: {schemeCategory}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSchemeCategory('All');
+                            setSchemePage(1);
+                          }}
+                          className="hover:bg-blue-200/60 rounded p-0.5 text-blue-700 cursor-pointer"
+                          title="Clear category filter"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    )}
+                    {schemeStatus !== 'all' && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 font-bold">
+                        <span>Status: {schemeStatus === 'active' ? 'Active Only' : 'Inactive Only'}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSchemeStatus('all');
+                            setSchemePage(1);
+                          }}
+                          className="hover:bg-amber-200/60 rounded p-0.5 text-amber-800 cursor-pointer"
+                          title="Clear status filter"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    )}
+                    {schemeSearch && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-bold">
+                        <span>Search: "{schemeSearch}"</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSchemeSearch('');
+                            setSchemePage(1);
+                          }}
+                          className="hover:bg-slate-200 rounded p-0.5 text-slate-600 cursor-pointer"
+                          title="Clear search"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSchemeCategory('All');
+                        setSchemeStatus('all');
+                        setSchemeSearch('');
+                        setSchemePage(1);
+                      }}
+                      className="text-[11px] font-bold text-slate-500 hover:text-slate-800 hover:underline cursor-pointer ml-auto"
+                    >
+                      Reset All
+                    </button>
+                  </div>
+                )}
+
                 {/* Expandable Advanced Filters Panel (CATEGORY | SORT BY | SORT ORDER) */}
                 {showMoreFilters && (
                   <div className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4 animate-fade-in">
@@ -1472,7 +1684,6 @@ export const AdminDashboardPage = () => {
                           <option value="title">Scheme Title</option>
                           <option value="category">Category</option>
                           <option value="updatedAt">Last Updated</option>
-                          <option value="beneficiariesCount">Beneficiaries</option>
                         </select>
                         <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]">
                           ▼
@@ -1530,8 +1741,6 @@ export const AdminDashboardPage = () => {
                           </div>
                         </th>
 
-                        <th className="p-4">Beneficiaries</th>
-
                         <th className="p-4">Last Updated</th>
 
                         <th
@@ -1550,7 +1759,7 @@ export const AdminDashboardPage = () => {
                     <tbody className="divide-y divide-slate-100">
                       {schemes.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="p-12 text-center text-slate-500 font-medium">
+                          <td colSpan={5} className="p-12 text-center text-slate-500 font-medium">
                             No government schemes match the selected filters.
                           </td>
                         </tr>
@@ -1578,11 +1787,6 @@ export const AdminDashboardPage = () => {
                               {/* Category */}
                               <td className="p-4 font-bold text-[#0052cc]">
                                 {scheme.category}
-                              </td>
-
-                              {/* Beneficiaries */}
-                              <td className="p-4 font-bold text-slate-700">
-                                {scheme.beneficiariesCount || '0.2M'}
                               </td>
 
                               {/* Last Updated */}
