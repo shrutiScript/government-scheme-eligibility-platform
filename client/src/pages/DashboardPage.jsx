@@ -28,7 +28,11 @@ export const DashboardPage = () => {
   const [allSchemes, setAllSchemes] = useState([]);
   const [popular, setPopular] = useState([]);
   const [recentlyAdded, setRecentlyAdded] = useState([]);
+<<<<<<< HEAD
   const [loading, setLoading] = useState(true);
+=======
+  const [loading, setLoading] = useState(!cachedEligibility?.eligibleSchemes);
+>>>>>>> second-copy
 
   // Filters & Controls for Explore Section
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,6 +45,7 @@ export const DashboardPage = () => {
     return ['All', ...Array.from(new Set(cleanList))];
   }, []);
 
+<<<<<<< HEAD
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
@@ -48,41 +53,88 @@ export const DashboardPage = () => {
         // Fetch all schemes for the Explore section
         const schemesRes = await schemeService.getSchemes({ limit: 100 });
         if (schemesRes.success && schemesRes.schemes) {
+=======
+  const userId = user?._id || user?.id;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchDashboardData = async () => {
+      try {
+        // Fetch all schemes for the Explore section
+        const schemesRes = await schemeService.getSchemes({ limit: 100 });
+        if (isMounted && schemesRes?.success && schemesRes?.schemes) {
+>>>>>>> second-copy
           setAllSchemes(schemesRes.schemes);
         }
 
         // Fetch popular & recently added
         const recRes = await eligibilityService.getRecommendations();
+<<<<<<< HEAD
         if (recRes.success) {
+=======
+        if (isMounted && recRes?.success) {
+>>>>>>> second-copy
           setPopular(recRes.popular || []);
           setRecentlyAdded(recRes.recentlyAdded || []);
         }
 
         // Auto-run background eligibility check if profile complete but no cache
+<<<<<<< HEAD
         if (isProfileComplete && (!cachedEligibility || cachedEligibility.eligibleCount === undefined)) {
           await runBackgroundEligibilityCheck(user);
+=======
+        if (isProfileComplete && (!cachedEligibility || !cachedEligibility.eligibleSchemes || cachedEligibility.eligibleSchemes.length === 0)) {
+          if (user) {
+            await runBackgroundEligibilityCheck(user);
+          }
+>>>>>>> second-copy
         }
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {
+<<<<<<< HEAD
         setLoading(false);
+=======
+        if (isMounted) {
+          setLoading(false);
+        }
+>>>>>>> second-copy
       }
     };
 
     fetchDashboardData();
+<<<<<<< HEAD
   }, [user, isProfileComplete]);
 
   // Extract raw eligible items and sort by highest eligibility score first (100% -> 95% -> 90%)
   const eligibleItems = useMemo(() => {
     if (!isProfileComplete || !cachedEligibility?.eligibleSchemes) return [];
     
+=======
+
+    return () => {
+      isMounted = false;
+    };
+  }, [userId, isProfileComplete]);
+
+  // Extract raw eligible items and sort by highest eligibility score first (100% -> 95% -> 90%)
+  const eligibleItems = useMemo(() => {
+    if (!cachedEligibility?.eligibleSchemes) return [];
+    if (cachedEligibility.userId && userId && cachedEligibility.userId !== userId) return [];
+
+>>>>>>> second-copy
     const list = [...cachedEligibility.eligibleSchemes];
     return list.sort((a, b) => {
       const scoreA = a.matchPercentage ?? 100;
       const scoreB = b.matchPercentage ?? 100;
       return scoreB - scoreA;
     });
+<<<<<<< HEAD
   }, [isProfileComplete, cachedEligibility]);
+=======
+  }, [cachedEligibility, userId]);
+>>>>>>> second-copy
 
   // Set of IDs of eligible schemes to exclude from the Browse / Explore section
   const eligibleSchemeIds = useMemo(() => {
@@ -124,6 +176,15 @@ export const DashboardPage = () => {
       if (sortBy === 'Most Popular') {
         return (b.viewCount || 0) - (a.viewCount || 0);
       }
+<<<<<<< HEAD
+=======
+      if (sortBy === 'Name A-Z') {
+        return (a.title || '').localeCompare(b.title || '');
+      }
+      if (sortBy === 'Name Z-A') {
+        return (b.title || '').localeCompare(a.title || '');
+      }
+>>>>>>> second-copy
       if (sortBy === 'Central') {
         const isACentral = a.state === 'Central' || a.state === 'All India' || !a.state;
         const isBCentral = b.state === 'Central' || b.state === 'All India' || !b.state;
@@ -242,14 +303,23 @@ export const DashboardPage = () => {
         )}
       </div>
 
+<<<<<<< HEAD
       {/* 2. MY ELIGIBLE SCHEMES (FIRST SECTION AFTER WELCOME BANNER) */}
       {eligibleItems.length > 0 && (
+=======
+      {/* 2. MY ELIGIBLE SCHEMES OR NO MATCHES CARD */}
+      {isProfileComplete && (
+>>>>>>> second-copy
         <section id="my-eligible-schemes" className="space-y-6">
           <div>
             <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2.5">
               <CheckCircle2 className="w-6 h-6 text-emerald-600" />
               <span>My Eligible Schemes</span>
+<<<<<<< HEAD
               <span className="px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">
+=======
+              <span className={`px-3 py-0.5 rounded-full text-xs font-extrabold ${eligibleItems.length > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'}`}>
+>>>>>>> second-copy
                 {eligibleItems.length} Matched
               </span>
             </h2>
@@ -258,13 +328,21 @@ export const DashboardPage = () => {
             </p>
           </div>
 
+<<<<<<< HEAD
           {loading ? (
+=======
+          {loading && eligibleItems.length === 0 ? (
+>>>>>>> second-copy
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="h-60 bg-slate-200 rounded-2xl animate-pulse"></div>
               ))}
             </div>
+<<<<<<< HEAD
           ) : (
+=======
+          ) : eligibleItems.length > 0 ? (
+>>>>>>> second-copy
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {eligibleItems.map((item, idx) => {
                 const schemeObj = item.scheme || item;
@@ -278,6 +356,32 @@ export const DashboardPage = () => {
                 );
               })}
             </div>
+<<<<<<< HEAD
+=======
+          ) : (
+            <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-sm text-center space-y-4 max-w-xl mx-auto">
+              <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto">
+                <AlertCircle className="w-7 h-7" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-extrabold text-slate-900">
+                  No Matching Schemes Found
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed max-w-md mx-auto">
+                  Based on your current profile parameters, no active government schemes match all criteria. You can update your profile or explore all available schemes below.
+                </p>
+              </div>
+              <div className="pt-2">
+                <Link
+                  to="/profile"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0f2942] hover:bg-[#0c2338] text-white text-xs font-bold rounded-xl transition-all shadow-sm"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Update Profile Parameters</span>
+                </Link>
+              </div>
+            </div>
+>>>>>>> second-copy
           )}
         </section>
       )}
@@ -308,8 +412,15 @@ export const DashboardPage = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold bg-slate-50 text-slate-800 focus:ring-2 focus:ring-[#0f2942] outline-none cursor-pointer"
               >
+<<<<<<< HEAD
                 <option value="Newest">Newest</option>
                 <option value="Most Popular">Most Popular</option>
+=======
+                <option value="Newest">Newest First</option>
+                <option value="Most Popular">Most Popular</option>
+                <option value="Name A-Z">Scheme Name (A → Z)</option>
+                <option value="Name Z-A">Scheme Name (Z → A)</option>
+>>>>>>> second-copy
                 <option value="Central">Central Schemes</option>
                 <option value="State">State Schemes</option>
                 <option value="Category">Category</option>
@@ -354,7 +465,11 @@ export const DashboardPage = () => {
         </div>
 
         {/* Remaining Schemes Grid */}
+<<<<<<< HEAD
         {loading ? (
+=======
+        {loading && allSchemes.length === 0 ? (
+>>>>>>> second-copy
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="h-60 bg-slate-200 rounded-2xl animate-pulse"></div>

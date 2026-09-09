@@ -30,11 +30,24 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+<<<<<<< HEAD
     // Demographic Profile Fields
     age: {
       type: Number,
       min: 0,
       max: 120
+=======
+    status: {
+      type: String,
+      enum: ['active', 'blocked'],
+      default: 'active'
+    },
+    // Demographic Profile Fields
+    age: {
+      type: Number,
+      min: [1, 'Age must be 1 or greater (cannot be 0 or negative)'],
+      max: [120, 'Age cannot exceed 120 years']
+>>>>>>> second-copy
     },
     gender: {
       type: String,
@@ -44,6 +57,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
+<<<<<<< HEAD
+=======
+    city: {
+      type: String,
+      trim: true
+    },
+    mobileNumber: {
+      type: String,
+      trim: true
+    },
+>>>>>>> second-copy
     occupation: {
       type: String,
       trim: true
@@ -54,7 +78,11 @@ const userSchema = new mongoose.Schema(
     },
     annualIncome: {
       type: Number,
+<<<<<<< HEAD
       min: 0
+=======
+      min: [0, 'Annual income cannot be negative']
+>>>>>>> second-copy
     },
     caste: {
       type: String,
@@ -68,18 +96,66 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+<<<<<<< HEAD
     avatar: {
       type: String,
       default: ''
     }
+=======
+    resetPasswordOtp: {
+      type: String,
+      default: null
+    },
+    resetPasswordExpire: {
+      type: Date,
+      default: null
+    },
+    avatar: {
+      type: String,
+      default: ''
+    },
+    savedSchemes: [
+      {
+        scheme: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Scheme',
+          required: true
+        },
+        savedAt: {
+          type: Date,
+          default: Date.now
+        }
+      }
+    ]
+>>>>>>> second-copy
   },
   {
     timestamps: true
   }
 );
 
+<<<<<<< HEAD
 // Hash password before saving if modified
 userSchema.pre('save', async function (next) {
+=======
+// Sync and Hash password before saving
+userSchema.pre('save', async function (next) {
+  // Sync status and isBlocked reliably based on which field was modified
+  if (this.isModified('isBlocked')) {
+    this.status = this.isBlocked ? 'blocked' : 'active';
+  } else if (this.isModified('status')) {
+    this.isBlocked = this.status === 'blocked';
+  } else {
+    if (this.isBlocked || this.status === 'blocked') {
+      this.isBlocked = true;
+      this.status = 'blocked';
+    } else {
+      this.isBlocked = false;
+      this.status = 'active';
+    }
+  }
+
+>>>>>>> second-copy
   if (!this.isModified('password')) return next();
   try {
     const salt = await bcrypt.genSalt(10);
@@ -99,6 +175,15 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
+<<<<<<< HEAD
+=======
+  // Ensure status field is always returned and accurate based on isBlocked
+  if (obj.isBlocked) {
+    obj.status = 'blocked';
+  } else {
+    obj.status = 'active';
+  }
+>>>>>>> second-copy
   return obj;
 };
 

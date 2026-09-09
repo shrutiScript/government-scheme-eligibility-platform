@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 import User from '../models/User.js';
 import { generateToken } from '../middleware/authMiddleware.js';
+=======
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import { generateToken, JWT_SECRET } from '../middleware/authMiddleware.js';
+import { logActivity } from '../utils/activityLogger.js';
+>>>>>>> second-copy
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -57,6 +64,7 @@ export const registerUser = async (req, res, next) => {
       role: role === 'admin' ? 'admin' : 'user'
     });
 
+<<<<<<< HEAD
     // 4. Generate JWT Token
     const token = generateToken(user._id);
 
@@ -71,6 +79,23 @@ export const registerUser = async (req, res, next) => {
         role: user.role,
         createdAt: user.createdAt
       },
+=======
+    // 4. Record registration activity (no sensitive data stored)
+    await logActivity({
+      action: 'User Registration',
+      user,
+      details: `New ${user.role} account "${user.name}" registered with email ${user.email}.`
+    });
+
+    // 5. Generate JWT Token
+    const token = generateToken(user._id);
+
+    // 6. Return HTTP 201 response
+    return res.status(201).json({
+      success: true,
+      message: 'Registration successful',
+      user: user.toJSON(),
+>>>>>>> second-copy
       token
     });
   } catch (error) {
@@ -110,15 +135,32 @@ export const loginUser = async (req, res, next) => {
       });
     }
 
+<<<<<<< HEAD
     if (user.isBlocked) {
       return res.status(403).json({
         success: false,
         message: 'Your account has been suspended by Administrator. Access is blocked.'
+=======
+    // Blocked accounts must never be granted an authenticated session.
+    if (user.isBlocked || user.status === 'blocked' || user.status === 'BLOCKED') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been blocked. Please contact the administrator.'
+>>>>>>> second-copy
       });
     }
 
     const token = generateToken(user._id);
 
+<<<<<<< HEAD
+=======
+    await logActivity({
+      action: 'User Login',
+      user,
+      details: `User "${user.name}" (${user.email}) signed in successfully.`
+    });
+
+>>>>>>> second-copy
     return res.status(200).json({
       success: true,
       message: 'Login successful',
@@ -130,6 +172,217 @@ export const loginUser = async (req, res, next) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+// @desc    Logout current user (best-effort, does not require valid session)
+// @route   POST /api/auth/logout
+// @access  Public
+export const logoutUser = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization || '';
+    if (authHeader.startsWith('Bearer')) {
+      try {
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = await User.findById(decoded.id).select('-password');
+        if (user) {
+          await logActivity({
+            action: 'User Logout',
+            user,
+            details: `User "${user.name}" (${user.email}) signed out.`
+          });
+        }
+      } catch (err) {
+        // Invalid/expired token — nothing to log, logout still succeeds.
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update profile details
+// @route   PUT /api/auth/profile
+// @access  Private
+export const updateProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User profile not found.'
+      });
+    }
+
+    if (req.body.name) user.name = req.body.name.trim();
+    if (req.body.phone !== undefined) user.phone = req.body.phone;
+    if (req.body.state !== undefined) user.state = req.body.state;
+    if (req.body.city !== undefined) user.city = req.body.city;
+    if (req.body.age !== undefined) user.age = req.body.age;
+    if (req.body.gender !== undefined) user.gender = req.body.gender;
+    if (req.body.occupation !== undefined) user.occupation = req.body.occupation;
+    if (req.body.education !== undefined) user.education = req.body.education;
+    if (req.body.annualIncome !== undefined) user.annualIncome = req.body.annualIncome;
+    if (req.body.caste !== undefined) user.caste = req.body.caste;
+    if (req.body.disabilityStatus !== undefined) user.disabilityStatus = req.body.disabilityStatus;
+    if (req.body.bplStatus !== undefined) user.bplStatus = req.body.bplStatus;
+
+    await user.save();
+
+    await logActivity({
+      action: user.role === 'admin' ? 'UPDATE ADMIN PROFILE' : 'EDIT PROFILE',
+      user,
+      details: `${user.role === 'admin' ? 'Administrator' : 'User'} "${user.name}" updated their profile information.`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: user.toJSON()
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update user account email
+// @route   PUT /api/auth/email
+// @access  Private
+export const updateEmail = async (req, res, next) => {
+  try {
+    const { currentPassword, newEmail } = req.body;
+
+    if (!currentPassword || !newEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide your current password and new email address.'
+      });
+    }
+
+    const cleanEmail = newEmail.trim().toLowerCase();
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid email address format.'
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.'
+      });
+    }
+
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: 'Current password verification failed. Please enter your correct password.'
+      });
+    }
+
+    if (user.email === cleanEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'New email address cannot be the same as your current email.'
+      });
+    }
+
+    const existingUser = await User.findOne({ email: cleanEmail });
+    if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+      return res.status(400).json({
+        success: false,
+        message: 'This email address is already in use by another account.'
+      });
+    }
+
+    const oldEmail = user.email;
+    user.email = cleanEmail;
+    await user.save();
+
+    const token = generateToken(user._id);
+
+    await logActivity({
+      action: user.role === 'admin' ? 'UPDATE ADMIN EMAIL' : 'UPDATE EMAIL',
+      user,
+      details: `${user.role === 'admin' ? 'Administrator' : 'User'} "${user.name}" changed email from "${oldEmail}" to "${cleanEmail}".`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Email address updated successfully',
+      user: user.toJSON(),
+      token
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update user password
+// @route   PUT /api/auth/password
+// @access  Private
+export const updatePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide both current password and new password.'
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'New password must be at least 6 characters in length.'
+      });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found.'
+      });
+    }
+
+    const isMatch = await user.matchPassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: 'Current password verification failed. Please enter your correct password.'
+      });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    await logActivity({
+      action: user.role === 'admin' ? 'UPDATE ADMIN PASSWORD' : 'UPDATE PASSWORD',
+      user,
+      details: `${user.role === 'admin' ? 'Administrator' : 'User'} "${user.name}" updated their account password.`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Account password changed successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+>>>>>>> second-copy
 // @desc    Get current user profile
 // @route   GET /api/auth/me
 // @access  Private
@@ -143,16 +396,217 @@ export const getMe = async (req, res, next) => {
       });
     }
 
+<<<<<<< HEAD
     if (user.isBlocked) {
       return res.status(403).json({
         success: false,
         message: 'Your account has been suspended by Administrator.'
+=======
+    if (user.isBlocked || user.status === 'blocked' || user.status === 'BLOCKED') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been blocked. Please contact the administrator.'
+>>>>>>> second-copy
       });
     }
 
     return res.status(200).json({
       success: true,
+<<<<<<< HEAD
       user
+=======
+      user: user.toJSON()
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Forgot Password - Generate 6-digit OTP (stored in DB & displayed for user)
+// @route   POST /api/auth/forgot-password
+// @access  Public
+export const forgotPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || typeof email !== 'string' || !email.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter your registered email address.'
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a valid email address.'
+      });
+    }
+
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Please enter a valid registered email address.'
+      });
+    }
+
+    if (user.isBlocked || user.status === 'blocked' || user.status === 'BLOCKED') {
+      return res.status(403).json({
+        success: false,
+        message: 'Your account has been suspended. Please contact the administrator.'
+      });
+    }
+
+    // Generate secure 6-digit numeric OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expireTime = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+    user.resetPasswordOtp = otp;
+    user.resetPasswordExpire = expireTime;
+    await user.save();
+
+    console.log(`[Password Reset] 🔑 Verification Code for ${cleanEmail}: ${otp} (expires in 10 mins)`);
+
+    await logActivity({
+      action: 'FORGOT PASSWORD OTP REQUESTED',
+      user,
+      details: `User "${user.name}" (${user.email}) requested a password reset verification code.`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Verification code sent successfully.',
+      email: cleanEmail,
+      otp // Provided so user sees verification code immediately without needing external Gmail setup
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Verify Reset OTP
+// @route   POST /api/auth/verify-reset-otp
+// @access  Public
+export const verifyResetOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and verification code are required.'
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanOtp = String(otp).trim();
+
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Please enter a valid registered email address.'
+      });
+    }
+
+    if (
+      !user.resetPasswordOtp ||
+      user.resetPasswordOtp !== cleanOtp ||
+      !user.resetPasswordExpire ||
+      user.resetPasswordExpire < new Date()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset code.'
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Verification code verified successfully.'
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Reset Password with OTP
+// @route   POST /api/auth/reset-password
+// @access  Public
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, otp, newPassword, confirmPassword } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required.'
+      });
+    }
+
+    if (!otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code is required.'
+      });
+    }
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 8 characters.'
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Passwords do not match.'
+      });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanOtp = String(otp).trim();
+
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Please enter a valid registered email address.'
+      });
+    }
+
+    if (
+      !user.resetPasswordOtp ||
+      user.resetPasswordOtp !== cleanOtp ||
+      !user.resetPasswordExpire ||
+      user.resetPasswordExpire < new Date()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired reset code.'
+      });
+    }
+
+    // Set new password (will be hashed automatically by pre-save hook)
+    user.password = newPassword;
+    user.resetPasswordOtp = null;
+    user.resetPasswordExpire = null;
+    await user.save();
+
+    await logActivity({
+      action: 'PASSWORD RESET COMPLETED',
+      user,
+      details: `User "${user.name}" (${user.email}) successfully reset their account password.`
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset successfully.'
+>>>>>>> second-copy
     });
   } catch (error) {
     next(error);

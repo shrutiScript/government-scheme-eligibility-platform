@@ -18,11 +18,18 @@ export const Pagination = ({ page, pages, onPageChange }) => {
         <button
           key={pageNum}
           onClick={() => onPageChange(pageNum)}
+<<<<<<< HEAD
           className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             pageNum === page
               ? 'bg-blue-900 text-white shadow-sm'
               : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
           }`}
+=======
+          className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer ${pageNum === page
+              ? 'bg-blue-900 text-white shadow-sm'
+              : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+            }`}
+>>>>>>> second-copy
         >
           {pageNum}
         </button>

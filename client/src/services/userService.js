@@ -15,5 +15,27 @@ export const userService = {
         'Content-Type': 'multipart/form-data'
       }
     });
+<<<<<<< HEAD
   }
 };
+=======
+  },
+
+  removeAvatar: async () => {
+    return await api.delete('/profile/avatar');
+  },
+
+  getSavedSchemes: async () => {
+    return await api.get('/profile/saved-schemes');
+  },
+
+  saveScheme: async (schemeId) => {
+    return await api.post(`/profile/saved-schemes/${schemeId}`);
+  },
+
+  removeSavedScheme: async (schemeId) => {
+    return await api.delete(`/profile/saved-schemes/${schemeId}`);
+  }
+};
+
+>>>>>>> second-copy

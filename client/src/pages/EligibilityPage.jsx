@@ -25,6 +25,7 @@ export const EligibilityPage = () => {
   const [sortBy, setSortBy] = useState('Newest');
   const [loading, setLoading] = useState(false);
 
+<<<<<<< HEAD
   // Auto-run background evaluation if user is complete but no cache exists
   useEffect(() => {
     if (isProfileComplete && (!cachedEligibility || !cachedEligibility.eligibleSchemes)) {
@@ -32,6 +33,19 @@ export const EligibilityPage = () => {
       runBackgroundEligibilityCheck(user).finally(() => setLoading(false));
     }
   }, [user, isProfileComplete, cachedEligibility]);
+=======
+  const userId = user?._id || user?.id;
+
+  // Auto-run background evaluation if user is complete but no cache exists
+  useEffect(() => {
+    if (isProfileComplete && (!cachedEligibility || !cachedEligibility.eligibleSchemes || cachedEligibility.eligibleSchemes.length === 0)) {
+      if (user) {
+        setLoading(true);
+        runBackgroundEligibilityCheck(user).finally(() => setLoading(false));
+      }
+    }
+  }, [userId, isProfileComplete]);
+>>>>>>> second-copy
 
   const rawEligibleSchemes = cachedEligibility?.eligibleSchemes || [];
 
@@ -198,7 +212,11 @@ export const EligibilityPage = () => {
           </div>
 
           {/* GRID OF ELIGIBLE SCHEMES */}
+<<<<<<< HEAD
           {loading ? (
+=======
+          {loading && filteredAndSortedSchemes.length === 0 ? (
+>>>>>>> second-copy
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="h-96 bg-slate-200 rounded-3xl animate-pulse"></div>

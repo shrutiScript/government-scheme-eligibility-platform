@@ -43,3 +43,32 @@ export const MatchBadge = ({ percentage = 0, isEligible = true }) => {
     </Badge>
   );
 };
+<<<<<<< HEAD
+=======
+
+export const SchemeStatusBadge = ({ isActive, status, className = '' }) => {
+  const isSchemeActive = status
+    ? status.toLowerCase() === 'active'
+    : Boolean(isActive);
+
+  if (isSchemeActive) {
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-300 select-none ${className}`}
+      >
+        <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+        <span>Active</span>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-300 select-none ${className}`}
+    >
+      <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+      <span>Inactive</span>
+    </span>
+  );
+};
+>>>>>>> second-copy

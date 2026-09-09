@@ -5,10 +5,24 @@ export const adminService = {
     return await api.get('/admin/stats');
   },
 
+<<<<<<< HEAD
+=======
+  getLogs: async (params = {}) => {
+    return await api.get('/admin/logs', { params });
+  },
+
+>>>>>>> second-copy
   getUsers: async (params = {}) => {
     return await api.get('/admin/users', { params });
   },
 
+<<<<<<< HEAD
+=======
+  updateUser: async (userId, userData) => {
+    return await api.put(`/admin/users/${userId}`, userData);
+  },
+
+>>>>>>> second-copy
   updateUserRole: async (userId, role) => {
     return await api.put(`/admin/users/${userId}/role`, { role });
   },
@@ -21,3 +35,8 @@ export const adminService = {
     return await api.delete(`/admin/users/${userId}`);
   }
 };
+<<<<<<< HEAD
+=======
+
+export default adminService;
+>>>>>>> second-copy

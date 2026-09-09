@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MatchBadge } from './Badge';
+=======
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { MatchBadge } from './Badge';
+import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
+import { userService } from '../services/userService';
+>>>>>>> second-copy
 import { 
   Building2, 
   Bookmark,
@@ -18,8 +27,72 @@ const CATEGORY_META = {
   'Employment & Skill Development': { emoji: '💼', label: 'Employment', bg: 'bg-indigo-50 text-indigo-700 border-indigo-200' }
 };
 
+<<<<<<< HEAD
 export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false, index = 0 }) => {
   const [saved, setSaved] = useState(false);
+=======
+export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false, index = 0, isInitiallySaved = false }) => {
+  const { citizenUser, isCitizenAuthenticated, updateUserState, updateSavedSchemes } = useAuth();
+  const { notifySuccess, notifyError, notifyWarning } = useNotification();
+  const [saved, setSaved] = useState(isInitiallySaved);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (citizenUser?.savedSchemes && Array.isArray(citizenUser.savedSchemes)) {
+      const isSaved = citizenUser.savedSchemes.some((item) => {
+        const id = item.scheme?._id || item.scheme || item;
+        return id?.toString() === scheme._id?.toString();
+      });
+      setSaved(isSaved);
+    } else {
+      setSaved(false);
+    }
+  }, [citizenUser, scheme._id]);
+
+  const handleToggleBookmark = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isCitizenAuthenticated) {
+      notifyWarning('Please sign in as a citizen to bookmark schemes to Your Schemes.');
+      return;
+    }
+
+    if (saving) return;
+    setSaving(true);
+
+    try {
+      if (saved) {
+        const res = await userService.removeSavedScheme(scheme._id);
+        if (res?.success) {
+          setSaved(false);
+          if (res.user) {
+            updateUserState(res.user);
+          } else if (res.savedSchemes) {
+            updateSavedSchemes(res.savedSchemes);
+          }
+          notifySuccess(`"${scheme.title}" removed from Your Schemes`);
+        }
+      } else {
+        const res = await userService.saveScheme(scheme._id);
+        if (res?.success) {
+          setSaved(true);
+          if (res.user) {
+            updateUserState(res.user);
+          } else if (res.savedSchemes) {
+            updateSavedSchemes(res.savedSchemes);
+          }
+          notifySuccess(`"${scheme.title}" saved to Your Schemes!`);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to toggle bookmark:', err);
+      notifyError(err?.response?.data?.message || err?.message || 'Failed to update bookmark. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+>>>>>>> second-copy
 
   // Category Metadata
   const catMeta = CATEGORY_META[scheme.category] || { 
@@ -54,6 +127,7 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
             {/* Bookmark Icon */}
             <button
               type="button"
+<<<<<<< HEAD
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -67,6 +141,18 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
               }`}
             >
               <Bookmark className={`w-4 h-4 transition-transform duration-200 ${saved ? 'fill-emerald-700 scale-110' : ''}`} />
+=======
+              onClick={handleToggleBookmark}
+              disabled={saving}
+              title={saved ? 'Remove from Your Schemes' : 'Save to Your Schemes'}
+              className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                saved 
+                  ? 'bg-amber-50 border-amber-300 text-amber-600 shadow-xs' 
+                  : 'border-[#E5E7EB] text-slate-400 hover:text-amber-600 hover:bg-amber-50/80 hover:border-amber-200'
+              }`}
+            >
+              <Bookmark className={`w-4 h-4 transition-transform duration-200 ${saved ? 'fill-amber-500 text-amber-600 scale-110' : ''}`} />
+>>>>>>> second-copy
             </button>
           </div>
         </div>
@@ -119,7 +205,10 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
           <Eye className="w-4 h-4 text-slate-700 shrink-0 stroke-[2.2]" />
           <span>View Details</span>
         </Link>
+<<<<<<< HEAD
 
+=======
+>>>>>>> second-copy
         {/* Right Button: Apply Now → */}
         {scheme.officialWebsiteUrl ? (
           <a

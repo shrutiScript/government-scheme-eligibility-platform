@@ -19,10 +19,24 @@ export const errorHandler = (err, req, res, next) => {
       .join(', ');
   }
 
+<<<<<<< HEAD
   // Handle Mongoose CastError (invalid ObjectId)
   if (err.name === 'CastError') {
     statusCode = 404;
     message = `Resource not found with id of ${err.value}`;
+=======
+  // Handle Mongoose CastError (invalid ObjectId or field casting)
+  if (err.name === 'CastError') {
+    if (err.path === '_id') {
+      statusCode = 404;
+      message = err.value && String(err.value).toLowerCase() === 'all'
+        ? 'Government Scheme not found'
+        : `Resource not found with id of ${err.value}`;
+    } else {
+      statusCode = 400;
+      message = `Invalid value for field "${err.path}"`;
+    }
+>>>>>>> second-copy
   }
 
   // Handle JWT Error

@@ -4,7 +4,13 @@ import App from './App.jsx';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
+<<<<<<< HEAD
   <React.StrictMode>
     <App />
   </React.StrictMode>
+=======
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
+>>>>>>> second-copy
 );

@@ -5,6 +5,7 @@ import { eligibilityService } from '../services/eligibilityService';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { Badge, MatchBadge } from '../components/Badge';
+<<<<<<< HEAD
 import { 
   Building2, 
   CheckCircle2, 
@@ -14,6 +15,17 @@ import {
   ArrowLeft, 
   Clock, 
   Users, 
+=======
+import {
+  Building2,
+  CheckCircle2,
+  FileText,
+  ExternalLink,
+  ShieldCheck,
+  ArrowLeft,
+  Clock,
+  Users,
+>>>>>>> second-copy
   AlertCircle,
   Sparkles,
   PhoneCall,
@@ -22,6 +34,10 @@ import {
   IndianRupee,
   MapPin,
   Briefcase,
+<<<<<<< HEAD
+=======
+  Layers,
+>>>>>>> second-copy
   HelpCircle,
   Info
 } from 'lucide-react';
@@ -90,13 +106,25 @@ export const SchemeDetailPage = () => {
       }
     };
 
+<<<<<<< HEAD
+=======
+    if (!id || id.toLowerCase() === 'all') {
+      navigate('/schemes', { replace: true });
+      return;
+    }
+
+>>>>>>> second-copy
     if (id) {
       fetchSchemeDetails();
     } else {
       setLoading(false);
       setError('Invalid Scheme ID');
     }
+<<<<<<< HEAD
   }, [id]);
+=======
+  }, [id, navigate]);
+>>>>>>> second-copy
 
   const runEligibilityCheck = useCallback(async () => {
     setEvaluating(true);
@@ -203,8 +231,13 @@ export const SchemeDetailPage = () => {
   const benefitsList = Array.isArray(scheme.benefits)
     ? scheme.benefits
     : scheme.benefits
+<<<<<<< HEAD
     ? [scheme.benefits]
     : [];
+=======
+      ? [scheme.benefits]
+      : [];
+>>>>>>> second-copy
 
   const docsList = scheme.documentsRequired || scheme.requiredDocuments || [];
   const tagsList = scheme.tags || [];
@@ -260,12 +293,25 @@ export const SchemeDetailPage = () => {
               {scheme.state || 'All India'}
             </span>
             {scheme.status && (
+<<<<<<< HEAD
               <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${
                 scheme.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
               }`}>
                 ● {scheme.status}
               </span>
             )}
+=======
+              <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${scheme.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
+                }`}>
+                ● {scheme.status}
+              </span>
+            )}
+            {(scheme.lastDate || scheme.applicationLastDate) && new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) && (
+              <span className="px-3 py-1 rounded-lg bg-rose-50 border border-rose-200 text-xs font-extrabold text-rose-700 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-rose-600" /> Application Deadline Expired
+              </span>
+            )}
+>>>>>>> second-copy
           </div>
 
           {matchResult && (
@@ -290,7 +336,11 @@ export const SchemeDetailPage = () => {
         </p>
 
         {/* Key Info Chips */}
+<<<<<<< HEAD
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 items-start">
+=======
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 items-start">
+>>>>>>> second-copy
           {scheme.benefitAmount && (
             <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -318,6 +368,25 @@ export const SchemeDetailPage = () => {
               </div>
             </div>
           )}
+<<<<<<< HEAD
+=======
+
+          {(scheme.lastDate || scheme.applicationLastDate) && (
+            <div className={`p-3.5 rounded-2xl border flex items-start gap-3 ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'bg-rose-50/80 border-rose-200/80' : 'bg-blue-50/80 border-blue-200/80'}`}>
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-800'}`}>
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <span className={`text-[10px] font-bold uppercase tracking-wider block mb-0.5 ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'text-rose-800' : 'text-blue-800'}`}>
+                  Last Date
+                </span>
+                <span className={`text-xs font-extrabold leading-snug block ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'text-rose-900' : 'text-blue-900'}`}>
+                  {scheme.lastDate || scheme.applicationLastDate} {new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? '(Expired)' : ''}
+                </span>
+              </div>
+            </div>
+          )}
+>>>>>>> second-copy
         </div>
 
         {/* Action Row */}
@@ -367,7 +436,11 @@ export const SchemeDetailPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column (2 Cols): Benefits, Application Process, Required Documents & Helpline */}
         <div className="lg:col-span-2 space-y-8">
+<<<<<<< HEAD
           
+=======
+
+>>>>>>> second-copy
           {/* Key Benefits */}
           <div className="surface-card p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
             <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2.5 border-b border-slate-100 pb-4">
@@ -449,6 +522,7 @@ export const SchemeDetailPage = () => {
 
         {/* Right Sidebar: Eligibility Criteria Matrix */}
         <aside className="space-y-6">
+<<<<<<< HEAD
           <div className="surface-card p-6 rounded-3xl bg-[#0f2942] text-white space-y-5 border border-slate-800 shadow-lg">
             <div className="flex items-center gap-2 border-b border-slate-700/80 pb-3">
               <Info className="w-4 h-4 text-[#e07a10]" />
@@ -509,12 +583,164 @@ export const SchemeDetailPage = () => {
                 <span className="text-slate-400 font-medium">BPL Status Req:</span>
                 <span className="font-bold text-white">
                   {criteria.bplRequired ? 'Yes (Mandatory)' : 'No'}
+=======
+          <div className="surface-card rounded-3xl bg-white border border-slate-200/90 shadow-md overflow-hidden transition-all">
+            {/* Header with Dark Navy Background */}
+            <div className="p-5 bg-[#0f2942] text-white space-y-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center border border-white/15 text-amber-400">
+                    <ShieldCheck className="w-4.5 h-4.5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-white">
+                      ELIGIBILITY MATRIX
+                    </h3>
+                    <p className="text-[11px] text-slate-300 font-medium">
+                      Scheme Requirements
+                    </p>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-bold tracking-wide">
+                  Verified
+>>>>>>> second-copy
                 </span>
               </div>
             </div>
 
+<<<<<<< HEAD
             <div className="pt-2 border-t border-slate-700/80 text-[11px] text-slate-400 text-center font-medium">
               Official Government Criteria verification active
+=======
+            {/* Matrix Body */}
+            <div className="p-5 space-y-4 text-xs">
+              {/* Age Limit */}
+              <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2 text-slate-600 font-semibold">
+                  <Calendar className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Age Limit</span>
+                </div>
+                <span className="font-extrabold text-slate-900 bg-slate-100 px-3 py-1 rounded-xl text-xs">
+                  {criteria.noAgeLimit || (criteria.minAge === null && criteria.maxAge === null)
+                    ? 'No Age Limit'
+                    : `${criteria.minAge ?? 1} – ${criteria.maxAge ?? 120} Years`}
+                </span>
+              </div>
+
+              {/* Max Annual Income */}
+              <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2 text-slate-600 font-semibold">
+                  <IndianRupee className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Max Annual Income</span>
+                </div>
+                <span className="font-extrabold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-3 py-1 rounded-xl text-xs">
+                  {criteria.noIncomeLimit || criteria.maxIncome === null || criteria.maxAnnualIncome === null
+                    ? 'No Income Limit'
+                    : `₹${(criteria.maxIncome ?? criteria.maxAnnualIncome ?? 0).toLocaleString('en-IN')} / Yr`}
+                </span>
+              </div>
+
+              {/* Target Gender */}
+              <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2 text-slate-600 font-semibold">
+                  <Users className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Target Gender</span>
+                </div>
+                <span className="font-bold text-slate-800 bg-slate-100 px-3 py-1 rounded-xl text-xs">
+                  {criteria.gender || 'All'}
+                </span>
+              </div>
+
+              {/* Target State */}
+              <div className="pb-3 border-b border-slate-100 space-y-2">
+                <div className="flex items-center gap-2 text-slate-600 font-semibold">
+                  <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Target State(s)</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pl-6">
+                  {Array.isArray(criteria.allowedStates) && criteria.allowedStates.length > 0 ? (
+                    criteria.allowedStates.map((st, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-900 border border-blue-100 text-[11px] font-bold">
+                        {st}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-900 border border-blue-100 text-[11px] font-bold">
+                      {scheme.state || 'All'}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Occupations */}
+              <div className="pb-3 border-b border-slate-100 space-y-2">
+                <div className="flex items-center gap-2 text-slate-600 font-semibold">
+                  <Briefcase className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Target Occupations</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pl-6">
+                  {Array.isArray(criteria.allowedOccupations) && criteria.allowedOccupations.length > 0 ? (
+                    criteria.allowedOccupations.map((occ, i) => (
+                      <span key={i} className="px-3 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200/70 text-xs font-bold">
+                        {occ}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] font-bold">
+                      All Occupations
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Castes / Social Category */}
+              <div className="pb-3 border-b border-slate-100 space-y-2">
+                <div className="flex items-center gap-2 text-slate-600 font-semibold">
+                  <Tag className="w-4 h-4 text-slate-400 shrink-0" />
+                  <span>Eligible Social Categories</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 pl-6">
+                  {Array.isArray(criteria.allowedCastes) && criteria.allowedCastes.length > 0 ? (
+                    criteria.allowedCastes.map((c, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg bg-purple-50 text-purple-900 border border-purple-100 text-[11px] font-bold">
+                        {c}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] font-bold">
+                      All Categories
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* PwD & BPL Requirements */}
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                    DISABILITY (PWD)
+                  </span>
+                  <span className={`text-xs font-black block ${criteria.disabilityRequired ? 'text-amber-700' : 'text-slate-800'}`}>
+                    {criteria.disabilityRequired ? 'Required' : 'Not Required'}
+                  </span>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                    BPL CARD
+                  </span>
+                  <span className={`text-xs font-black block ${criteria.bplRequired ? 'text-amber-700' : 'text-slate-800'}`}>
+                    {criteria.bplRequired ? 'Required' : 'Not Required'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-center gap-2 text-xs font-bold text-slate-600">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Official Government Criteria Active</span>
+>>>>>>> second-copy
             </div>
           </div>
         </aside>

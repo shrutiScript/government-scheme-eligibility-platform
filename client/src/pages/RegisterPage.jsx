@@ -2,13 +2,21 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
+<<<<<<< HEAD
 import { Loader2 } from 'lucide-react';
+=======
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+>>>>>>> second-copy
 import { PageMotionWrapper } from '../components/PageMotionWrapper';
 
 export const RegisterPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+<<<<<<< HEAD
+=======
+  const [showPassword, setShowPassword] = useState(false);
+>>>>>>> second-copy
   const [role, setRole] = useState('user');
   const [loading, setLoading] = useState(false);
 
@@ -50,7 +58,11 @@ export const RegisterPage = () => {
   };
 
   return (
+<<<<<<< HEAD
     <PageMotionWrapper className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12 bg-slate-50">
+=======
+    <PageMotionWrapper className="min-h-screen flex items-center justify-center px-4 py-12 bg-slate-50">
+>>>>>>> second-copy
       <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-xl space-y-6">
         {/* Toggle Pill Bar (Sign in | Register) */}
         <div className="bg-slate-100 p-1 rounded-2xl flex items-center">
@@ -114,6 +126,7 @@ export const RegisterPage = () => {
             <label className="block text-xs font-semibold text-slate-700 mb-1.5">
               Password (Min 6 characters) *
             </label>
+<<<<<<< HEAD
             <input
               type="password"
               value={password}
@@ -124,6 +137,33 @@ export const RegisterPage = () => {
               disabled={loading}
               className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0f2942] outline-none disabled:opacity-60"
             />
+=======
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                disabled={loading}
+                className="w-full px-3.5 py-2.5 pr-10 border border-slate-200 rounded-xl text-sm bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-[#0f2942] outline-none disabled:opacity-60"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex="-1"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 focus:outline-none cursor-pointer transition-colors p-1"
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+>>>>>>> second-copy
           </div>
 
           {/* <div>

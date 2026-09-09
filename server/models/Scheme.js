@@ -46,12 +46,47 @@ const schemeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed, // Can be array of strings or formatted string
       default: ''
     },
+<<<<<<< HEAD
     eligibilityCriteria: {
       minAge: { type: Number, default: 0 },
       maxAge: { type: Number, default: 120 },
       gender: { type: String, default: 'All' },
       maxIncome: { type: Number, default: 10000000 },
       minIncome: { type: Number, default: 0 },
+=======
+    code: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    sponsorType: {
+      type: String,
+      default: 'Central Scheme',
+      trim: true
+    },
+    detailedDescription: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    targetStates: {
+      type: [String],
+      default: ['All']
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
+    eligibilityCriteria: {
+      noAgeLimit: { type: Boolean, default: false },
+      minAge: { type: Number, default: null },
+      maxAge: { type: Number, default: null },
+      noIncomeLimit: { type: Boolean, default: false },
+      maxIncome: { type: Number, default: null },
+      maxAnnualIncome: { type: Number, default: null },
+      minIncome: { type: Number, default: 0 },
+      gender: { type: String, default: 'All' },
+>>>>>>> second-copy
       allowedStates: { type: [String], default: ['All'] },
       allowedOccupations: { type: [String], default: ['All'] },
       allowedEducations: { type: [String], default: ['All'] },
@@ -59,6 +94,19 @@ const schemeSchema = new mongoose.Schema(
       disabilityRequired: { type: Boolean, default: false },
       bplRequired: { type: Boolean, default: false }
     },
+<<<<<<< HEAD
+=======
+    // Alternate eligibility shape used by the admin form. Persisted consistently
+    // with eligibilityCriteria so both read paths always see the same rules.
+    eligibility: {
+      type: mongoose.Schema.Types.Mixed,
+      default: undefined
+    },
+    requiredDocuments: {
+      type: [String],
+      default: []
+    },
+>>>>>>> second-copy
     documentsRequired: {
       type: [String],
       default: []
@@ -80,6 +128,19 @@ const schemeSchema = new mongoose.Schema(
       type: String,
       default: '2019-02-24'
     },
+<<<<<<< HEAD
+=======
+    lastDate: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    applicationLastDate: {
+      type: String,
+      default: '',
+      trim: true
+    },
+>>>>>>> second-copy
     tags: {
       type: [String],
       default: []
@@ -99,6 +160,25 @@ const schemeSchema = new mongoose.Schema(
   }
 );
 
+<<<<<<< HEAD
+=======
+// Ensure status and isActive are always in sync
+schemeSchema.pre('save', function (next) {
+  if (this.isModified('status')) {
+    this.isActive = this.status === 'Active';
+  } else if (this.isModified('isActive')) {
+    this.status = this.isActive ? 'Active' : 'Inactive';
+  }
+  if (!this.description && this.detailedDescription) {
+    this.description = this.detailedDescription;
+  }
+  if (!this.shortDescription && this.description) {
+    this.shortDescription = this.description.slice(0, 200);
+  }
+  next();
+});
+
+>>>>>>> second-copy
 // Search Index
 schemeSchema.index({ title: 'text', description: 'text', department: 'text', category: 'text', tags: 'text' });
 

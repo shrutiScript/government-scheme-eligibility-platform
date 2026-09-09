@@ -1,0 +1,3 @@
+USERS IN DATABASE:
+- Name: admin, Email: admin@gmail.com, Role: admin, isBlocked: false, status: active
+- Name: Shruti, Email: shruti@gmail.com, Role: user, isBlocked: true, status: blocked

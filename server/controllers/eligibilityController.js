@@ -1,4 +1,5 @@
 import Scheme from '../models/Scheme.js';
+<<<<<<< HEAD
 
 // Helper function to evaluate scheme eligibility for a given profile
 const evaluateSchemeEligibility = (scheme, profile) => {
@@ -48,11 +49,159 @@ const evaluateSchemeEligibility = (scheme, profile) => {
       if (!matchState) {
         reasonsNotEligible.push(`Available in: ${criteria.allowedStates.join(', ')} (Your state: ${profile.state})`);
         score -= 25;
+=======
+import User from '../models/User.js';
+
+/**
+ * Check if a criteria field represents "All" / "No Restriction"
+ */
+const isUnrestricted = (val) => {
+  if (!val) return true;
+  if (typeof val === 'string') {
+    const s = val.trim().toLowerCase();
+    return s === '' || s === 'all' || s === 'all india' || s === 'all states' || s === 'all genders' || s === 'all categories' || s === 'all occupations' || s === 'all education' || s === 'any' || s === 'no restriction' || s === 'central';
+  }
+  if (Array.isArray(val)) {
+    if (val.length === 0) return true;
+    return val.some((item) => isUnrestricted(item));
+  }
+  return false;
+};
+
+/**
+ * Check if user profile has sufficient demographic data
+ */
+export const hasDemographicProfile = (profile) => {
+  if (!profile || typeof profile !== 'object') return false;
+  return Boolean(
+    (profile.age !== undefined && profile.age !== null && profile.age !== '') ||
+    (profile.annualIncome !== undefined && profile.annualIncome !== null && profile.annualIncome !== '') ||
+    profile.gender ||
+    profile.state ||
+    profile.occupation ||
+    profile.education ||
+    profile.caste ||
+    profile.disabilityStatus ||
+    profile.bplStatus
+  );
+};
+
+/**
+ * Helper function to evaluate scheme eligibility for a given profile
+ */
+export const evaluateSchemeEligibility = (scheme, profile = {}) => {
+  // Merge both supported eligibility shapes
+  const ec = scheme.eligibilityCriteria || {};
+  const e = scheme.eligibility || {};
+  const criteria = {
+    ...ec,
+    ...e
+  };
+
+  const reasonsNotEligible = [];
+  const qualifyingFactors = [];
+  let score = 100;
+
+  // 1. Age Check (Ignore age completely if "No Age Limit")
+  const isNoAgeLimit = Boolean(
+    criteria.noAgeLimit === true ||
+    criteria.ageLimit === 'No Age Limit' ||
+    (criteria.minAge === null && criteria.maxAge === null)
+  );
+
+  if (!isNoAgeLimit) {
+    const minAge = criteria.minAge !== undefined && criteria.minAge !== null ? Number(criteria.minAge) : 1;
+    const maxAge = criteria.maxAge !== undefined && criteria.maxAge !== null ? Number(criteria.maxAge) : 120;
+
+    if (profile.age !== undefined && profile.age !== null && profile.age !== '') {
+      const userAge = Number(profile.age);
+      if (!isNaN(userAge)) {
+        if (minAge > 0 && userAge < minAge) {
+          reasonsNotEligible.push(`Minimum required age is ${minAge} years (Your age: ${userAge})`);
+          score -= 25;
+        }
+        if (maxAge > 0 && maxAge <= 120 && userAge > maxAge) {
+          reasonsNotEligible.push(`Maximum allowed age is ${maxAge} years (Your age: ${userAge})`);
+          score -= 25;
+        }
+        if (userAge >= minAge && userAge <= maxAge) {
+          qualifyingFactors.push(`Age (${userAge} yrs) satisfies age requirements (${minAge}–${maxAge} yrs)`);
+        }
+      }
+    }
+  } else {
+    qualifyingFactors.push('No age restriction on this scheme');
+  }
+
+  // 2. Gender Check
+  const genderRule = criteria.gender;
+  if (!isUnrestricted(genderRule)) {
+    if (profile.gender && profile.gender.trim()) {
+      const allowedGenders = Array.isArray(genderRule) ? genderRule : [genderRule];
+      const matchGender = allowedGenders.some(
+        (g) => String(g).trim().toLowerCase() === String(profile.gender).trim().toLowerCase()
+      );
+      if (!matchGender) {
+        reasonsNotEligible.push(`Scheme is designated specifically for ${allowedGenders.join('/')} applicants`);
+        score -= 30;
+      } else {
+        qualifyingFactors.push(`Matches eligible gender (${profile.gender})`);
+      }
+    }
+  }
+
+  // 3. Annual Income Check
+  const isNoIncomeLimit = Boolean(
+    criteria.noIncomeLimit === true ||
+    criteria.incomeLimit === 'No Income Limit' ||
+    criteria.maxIncome === null ||
+    criteria.maxAnnualIncome === null
+  );
+
+  if (!isNoIncomeLimit) {
+    const maxIncome = criteria.maxIncome !== undefined && criteria.maxIncome !== null ? Number(criteria.maxIncome) : (criteria.maxAnnualIncome !== undefined && criteria.maxAnnualIncome !== null ? Number(criteria.maxAnnualIncome) : null);
+    const minIncome = criteria.minIncome !== undefined && criteria.minIncome !== null ? Number(criteria.minIncome) : 0;
+
+    if (maxIncome !== null && profile.annualIncome !== undefined && profile.annualIncome !== null && profile.annualIncome !== '') {
+      const userIncome = Number(profile.annualIncome);
+      if (!isNaN(userIncome)) {
+        if (maxIncome > 0 && userIncome > maxIncome) {
+          reasonsNotEligible.push(`Annual income ceiling is ₹${maxIncome.toLocaleString('en-IN')} (Your income: ₹${userIncome.toLocaleString('en-IN')})`);
+          score -= 30;
+        } else if (maxIncome > 0) {
+          qualifyingFactors.push(`Income (₹${userIncome.toLocaleString('en-IN')}) is within limit of ₹${maxIncome.toLocaleString('en-IN')}`);
+        }
+
+        if (minIncome > 0 && userIncome < minIncome) {
+          reasonsNotEligible.push(`Minimum annual income requirement is ₹${minIncome.toLocaleString('en-IN')}`);
+          score -= 20;
+        }
+      }
+    }
+  } else {
+    qualifyingFactors.push('No income limit on this scheme');
+  }
+
+  // 4. State & City Check
+  const stateRule = criteria.allowedStates || (scheme.state ? [scheme.state] : ['All']);
+  if (!isUnrestricted(stateRule)) {
+    if (profile.state && profile.state.trim()) {
+      const statesArray = Array.isArray(stateRule) ? stateRule : [stateRule];
+      const matchState = statesArray.some(
+        (s) => isUnrestricted(s) || String(s).trim().toLowerCase() === String(profile.state).trim().toLowerCase()
+      );
+      if (!matchState) {
+        reasonsNotEligible.push(`Applicable in: ${statesArray.join(', ')} (Your state: ${profile.state})`);
+        score -= 25;
+      } else {
+        qualifyingFactors.push(`Applicable in your state (${profile.state})`);
+>>>>>>> second-copy
       }
     }
   }
 
   // 5. Occupation Check
+<<<<<<< HEAD
   if (profile.occupation && criteria.allowedOccupations && Array.isArray(criteria.allowedOccupations)) {
     const hasAllOcc = criteria.allowedOccupations.some(o => o.toLowerCase() === 'all');
     if (!hasAllOcc) {
@@ -60,10 +209,28 @@ const evaluateSchemeEligibility = (scheme, profile) => {
       if (!matchOcc) {
         reasonsNotEligible.push(`Eligible occupations: ${criteria.allowedOccupations.join(', ')} (Your occupation: ${profile.occupation})`);
         score -= 20;
+=======
+  const occRule = criteria.allowedOccupations || criteria.occupations;
+  if (!isUnrestricted(occRule)) {
+    if (profile.occupation && profile.occupation.trim()) {
+      const occList = Array.isArray(occRule) ? occRule : [occRule];
+      const pOcc = String(profile.occupation).trim().toLowerCase();
+      const matchOcc = occList.some((o) => {
+        if (isUnrestricted(o)) return true;
+        const oLower = String(o).trim().toLowerCase();
+        return oLower === pOcc || oLower.includes(pOcc) || pOcc.includes(oLower);
+      });
+      if (!matchOcc) {
+        reasonsNotEligible.push(`Eligible occupations: ${occList.join(', ')} (Your occupation: ${profile.occupation})`);
+        score -= 20;
+      } else {
+        qualifyingFactors.push(`Matches occupation criteria (${profile.occupation})`);
+>>>>>>> second-copy
       }
     }
   }
 
+<<<<<<< HEAD
   // 6. Disability Check
   if (criteria.disabilityRequired && !profile.disabilityStatus) {
     reasonsNotEligible.push('Disability certificate / PwD status required');
@@ -74,6 +241,66 @@ const evaluateSchemeEligibility = (scheme, profile) => {
   if (criteria.bplRequired && !profile.bplStatus) {
     reasonsNotEligible.push('Below Poverty Line (BPL) card / status required');
     score -= 30;
+=======
+  // 6. Caste / Social Category Check
+  const casteRule = criteria.allowedCastes || criteria.castes || criteria.allowedCategories;
+  if (!isUnrestricted(casteRule)) {
+    if (profile.caste && profile.caste.trim()) {
+      const casteList = Array.isArray(casteRule) ? casteRule : [casteRule];
+      const pCaste = String(profile.caste).trim().toLowerCase();
+      const matchCaste = casteList.some((c) => {
+        if (isUnrestricted(c)) return true;
+        const cLower = String(c).trim().toLowerCase();
+        return cLower === pCaste || cLower.includes(pCaste) || pCaste.includes(cLower);
+      });
+      if (!matchCaste) {
+        reasonsNotEligible.push(`Eligible social categories: ${casteList.join(', ')} (Your category: ${profile.caste})`);
+        score -= 20;
+      } else {
+        qualifyingFactors.push(`Matches social category (${profile.caste})`);
+      }
+    }
+  }
+
+  // 7. Education Check
+  const eduRule = criteria.allowedEducations || criteria.educationLevels;
+  if (!isUnrestricted(eduRule)) {
+    if (profile.education && profile.education.trim()) {
+      const eduList = Array.isArray(eduRule) ? eduRule : [eduRule];
+      const pEdu = String(profile.education).trim().toLowerCase();
+      const matchEdu = eduList.some((e) => {
+        if (isUnrestricted(e)) return true;
+        const eLower = String(e).trim().toLowerCase();
+        return eLower === pEdu || eLower.includes(pEdu) || pEdu.includes(eLower);
+      });
+      if (!matchEdu) {
+        reasonsNotEligible.push(`Eligible education levels: ${eduList.join(', ')} (Your education: ${profile.education})`);
+        score -= 20;
+      } else {
+        qualifyingFactors.push(`Matches education profile (${profile.education})`);
+      }
+    }
+  }
+
+  // 8. Disability Status Check
+  if (criteria.disabilityRequired === true) {
+    if (!profile.disabilityStatus) {
+      reasonsNotEligible.push('Disability certificate / PwD status required');
+      score -= 30;
+    } else {
+      qualifyingFactors.push('Satisfies PwD beneficiary requirement');
+    }
+  }
+
+  // 9. BPL Status Check
+  if (criteria.bplRequired === true) {
+    if (!profile.bplStatus) {
+      reasonsNotEligible.push('Below Poverty Line (BPL) card / status required');
+      score -= 30;
+    } else {
+      qualifyingFactors.push('Satisfies BPL cardholder entitlement');
+    }
+>>>>>>> second-copy
   }
 
   const isEligible = reasonsNotEligible.length === 0;
@@ -83,7 +310,12 @@ const evaluateSchemeEligibility = (scheme, profile) => {
     scheme,
     isEligible,
     matchPercentage,
+<<<<<<< HEAD
     reasonsNotEligible
+=======
+    reasonsNotEligible,
+    qualifyingFactors
+>>>>>>> second-copy
   };
 };
 
@@ -92,8 +324,41 @@ const evaluateSchemeEligibility = (scheme, profile) => {
 // @access  Public / Private
 export const checkEligibility = async (req, res, next) => {
   try {
+<<<<<<< HEAD
     const profile = req.body || {};
     const schemes = await Scheme.find({ status: 'Active' });
+=======
+    let profile = req.body || {};
+
+    // If user is authenticated and body is empty or partial, supplement with DB profile
+    if (req.user) {
+      const user = await User.findById(req.user._id || req.user.id);
+      if (user) {
+        profile = {
+          name: user.name,
+          age: user.age,
+          gender: user.gender,
+          state: user.state,
+          city: user.city,
+          occupation: user.occupation,
+          education: user.education,
+          annualIncome: user.annualIncome,
+          caste: user.caste,
+          disabilityStatus: user.disabilityStatus,
+          bplStatus: user.bplStatus,
+          ...profile
+        };
+      }
+    }
+
+    // Only ACTIVE schemes are evaluated
+    const schemes = await Scheme.find({
+      $and: [
+        { status: { $in: ['Active', 'ACTIVE', 'active'] } },
+        { isActive: { $ne: false } }
+      ]
+    });
+>>>>>>> second-copy
 
     const eligibleSchemes = [];
     const notEligibleSchemes = [];
@@ -107,22 +372,45 @@ export const checkEligibility = async (req, res, next) => {
       }
     });
 
+<<<<<<< HEAD
     return res.status(200).json({
       success: true,
       totalChecked: schemes.length,
       eligibleSchemes,
       notEligibleSchemes
+=======
+    // Sort eligible schemes by highest match percentage then creation date
+    eligibleSchemes.sort((a, b) => {
+      if (b.matchPercentage !== a.matchPercentage) {
+        return b.matchPercentage - a.matchPercentage;
+      }
+      return new Date(b.scheme.createdAt || 0) - new Date(a.scheme.createdAt || 0);
+    });
+
+    return res.status(200).json({
+      success: true,
+      totalChecked: schemes.length,
+      eligibleCount: eligibleSchemes.length,
+      eligibleSchemes,
+      notEligibleSchemes,
+      profileUsed: profile
+>>>>>>> second-copy
     });
   } catch (error) {
     next(error);
   }
 };
 
+<<<<<<< HEAD
 // @desc    Get dashboard recommendations (Recommended, Popular, Recently Added)
+=======
+// @desc    Get dashboard recommendations based on saved profile
+>>>>>>> second-copy
 // @route   GET /api/eligibility/recommendations
 // @access  Public / Private
 export const getRecommendations = async (req, res, next) => {
   try {
+<<<<<<< HEAD
     const activeSchemes = await Scheme.find({ status: 'Active' }).sort({ createdAt: -1 });
 
     const popular = [...activeSchemes].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
@@ -132,6 +420,75 @@ export const getRecommendations = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       recommended,
+=======
+    // Only ACTIVE schemes are included
+    const activeSchemes = await Scheme.find({
+      $and: [
+        { status: { $in: ['Active', 'ACTIVE', 'active'] } },
+        { isActive: { $ne: false } }
+      ]
+    }).sort({ createdAt: -1 });
+
+    const popular = [...activeSchemes].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
+    const recentlyAdded = activeSchemes.slice(0, 6);
+
+    let recommended = [];
+    let eligibleSchemes = [];
+    let notEligibleSchemes = [];
+    let isProfileEvaluated = false;
+
+    // If authenticated user, evaluate recommendations against their saved profile
+    if (req.user) {
+      const user = await User.findById(req.user._id || req.user.id);
+      if (user && hasDemographicProfile(user)) {
+        isProfileEvaluated = true;
+        const profile = {
+          age: user.age,
+          gender: user.gender,
+          state: user.state,
+          city: user.city,
+          occupation: user.occupation,
+          education: user.education,
+          annualIncome: user.annualIncome,
+          caste: user.caste,
+          disabilityStatus: user.disabilityStatus,
+          bplStatus: user.bplStatus
+        };
+
+        activeSchemes.forEach((scheme) => {
+          const result = evaluateSchemeEligibility(scheme, profile);
+          if (result.isEligible) {
+            eligibleSchemes.push(result);
+          } else {
+            notEligibleSchemes.push(result);
+          }
+        });
+
+        // Sort eligible schemes by matchPercentage and recency
+        eligibleSchemes.sort((a, b) => {
+          if (b.matchPercentage !== a.matchPercentage) {
+            return b.matchPercentage - a.matchPercentage;
+          }
+          return new Date(b.scheme.createdAt || 0) - new Date(a.scheme.createdAt || 0);
+        });
+
+        recommended = eligibleSchemes.map((item) => item.scheme);
+      }
+    }
+
+    // Fallback if no recommended schemes or user not logged in
+    if (recommended.length === 0) {
+      recommended = activeSchemes.slice(0, 6);
+    }
+
+    return res.status(200).json({
+      success: true,
+      isProfileEvaluated,
+      eligibleCount: eligibleSchemes.length,
+      eligibleSchemes,
+      notEligibleSchemes,
+      recommended: recommended.slice(0, 10),
+>>>>>>> second-copy
       popular: popular.slice(0, 6),
       recentlyAdded
     });
@@ -139,3 +496,7 @@ export const getRecommendations = async (req, res, next) => {
     next(error);
   }
 };
+<<<<<<< HEAD
+=======
+
+>>>>>>> second-copy

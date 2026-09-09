@@ -47,7 +47,11 @@ export const HomePage = () => {
             <div className="absolute inset-0 bg-[radial-gradient(#0052cc_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.035] pointer-events-none" />
             <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> second-copy
             {/* Ashoka Chakra Subtle Background Motif (Continuous Smooth 360° Clockwise Rotation) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] opacity-[0.07] pointer-events-none text-[#0052cc] z-0 flex items-center justify-center">
               <svg className="w-full h-full animate-spin-slow origin-center" style={{ animationDuration: '24s' }} viewBox="0 0 100 100">

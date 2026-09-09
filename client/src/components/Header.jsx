@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+<<<<<<< HEAD
 import { Menu, X, ChevronDown, LayoutDashboard, User, Shield, LogOut } from 'lucide-react';
 
 export const Header = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+=======
+import { Menu, X, ChevronDown, LayoutDashboard, User, Bookmark, LogOut } from 'lucide-react';
+
+export const Header = () => {
+  const {
+    citizenUser,
+    isCitizenAuthenticated,
+    logoutCitizen
+  } = useAuth();
+>>>>>>> second-copy
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -25,7 +36,11 @@ export const Header = () => {
   }, []);
 
   const handleLogout = () => {
+<<<<<<< HEAD
     logout();
+=======
+    logoutCitizen();
+>>>>>>> second-copy
     setDropdownOpen(false);
     navigate('/login');
   };
@@ -34,9 +49,14 @@ export const Header = () => {
 
   return (
     <header
+<<<<<<< HEAD
       className={`sticky top-0 z-40 bg-white border-b border-slate-200 transition-transform duration-300 ease-in-out ${
         visible ? 'translate-y-0' : '-translate-y-full'
       }`}
+=======
+      className={`sticky top-0 z-40 bg-white border-b border-slate-200 transition-transform duration-300 ease-in-out ${visible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+>>>>>>> second-copy
     >
 
       <div className="w-full px-6 md:px-8">
@@ -65,6 +85,7 @@ export const Header = () => {
           <nav className="hidden md:flex items-center gap-8">
             <Link
               to="/"
+<<<<<<< HEAD
               className={`relative py-1 text-sm tracking-wide transition-colors group ${
                 isActive('/') ? 'text-[#0f2942] font-semibold' : 'text-slate-500 font-medium hover:text-[#0f2942]'
               }`}
@@ -74,11 +95,21 @@ export const Header = () => {
                 className={`absolute bottom-0 left-0 h-[1px] transition-all duration-300 ease-out ${
                   isActive('/') ? 'w-full bg-[#0f2942]' : 'w-0 bg-[#0f2942] group-hover:w-full'
                 }`}
+=======
+              className={`relative py-1 text-sm tracking-wide transition-colors group ${isActive('/') ? 'text-[#0f2942] font-semibold' : 'text-slate-500 font-medium hover:text-[#0f2942]'
+                }`}
+            >
+              <span>Home</span>
+              <span
+                className={`absolute bottom-0 left-0 h-[1px] transition-all duration-300 ease-out ${isActive('/') ? 'w-full bg-[#0f2942]' : 'w-0 bg-[#0f2942] group-hover:w-full'
+                  }`}
+>>>>>>> second-copy
               />
             </Link>
 
             <Link
               to="/schemes"
+<<<<<<< HEAD
               className={`relative py-1 text-sm tracking-wide transition-colors group ${
                 isActive('/schemes') ? 'text-[#0f2942] font-semibold' : 'text-slate-500 font-medium hover:text-[#0f2942]'
               }`}
@@ -103,6 +134,28 @@ export const Header = () => {
                   className={`absolute bottom-0 left-0 h-[1px] transition-all duration-300 ease-out ${
                     isActive('/dashboard') ? 'w-full bg-[#0f2942]' : 'w-0 bg-[#0f2942] group-hover:w-full'
                   }`}
+=======
+              className={`relative py-1 text-sm tracking-wide transition-colors group ${isActive('/schemes') ? 'text-[#0f2942] font-semibold' : 'text-slate-500 font-medium hover:text-[#0f2942]'
+                }`}
+            >
+              <span>Browse Schemes</span>
+              <span
+                className={`absolute bottom-0 left-0 h-[1px] transition-all duration-300 ease-out ${isActive('/schemes') ? 'w-full bg-[#0f2942]' : 'w-0 bg-[#0f2942] group-hover:w-full'
+                  }`}
+              />
+            </Link>
+
+            {isCitizenAuthenticated && (
+              <Link
+                to="/dashboard"
+                className={`relative py-1 text-sm tracking-wide transition-colors group ${isActive('/dashboard') ? 'text-[#0f2942] font-semibold' : 'text-slate-500 font-medium hover:text-[#0f2942]'
+                  }`}
+              >
+                <span>Dashboard</span>
+                <span
+                  className={`absolute bottom-0 left-0 h-[1px] transition-all duration-300 ease-out ${isActive('/dashboard') ? 'w-full bg-[#0f2942]' : 'w-0 bg-[#0f2942] group-hover:w-full'
+                    }`}
+>>>>>>> second-copy
                 />
               </Link>
             )}
@@ -110,12 +163,17 @@ export const Header = () => {
 
           {/* Right Auth Links */}
           <div className="hidden md:flex items-center gap-7">
+<<<<<<< HEAD
             {isAuthenticated ? (
+=======
+            {isCitizenAuthenticated ? (
+>>>>>>> second-copy
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2.5 p-1.5 pl-3 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer"
                 >
+<<<<<<< HEAD
                   {user?.avatar ? (
                     <img
                       src={user.avatar}
@@ -129,6 +187,13 @@ export const Header = () => {
                   )}
                   <span className="text-xs font-semibold text-slate-800 max-w-[120px] truncate">
                     {user?.name}
+=======
+                  <div className="w-7 h-7 rounded-full bg-[#0f2942] text-[#e07a10] text-xs font-black flex items-center justify-center border border-slate-300 select-none">
+                    {citizenUser?.name ? citizenUser.name.trim().charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <span className="text-xs font-semibold text-slate-800 max-w-[120px] truncate">
+                    {citizenUser?.name}
+>>>>>>> second-copy
                   </span>
                   <ChevronDown className="w-4 h-4 text-slate-400" />
                 </button>
@@ -137,8 +202,13 @@ export const Header = () => {
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-fade-in">
                     <div className="px-4 py-2.5 border-b border-slate-100">
+<<<<<<< HEAD
                       <p className="text-[11px] text-slate-400 font-medium">Signed in as</p>
                       <p className="text-xs font-bold text-slate-900 truncate">{user?.email}</p>
+=======
+                      <p className="text-[11px] text-slate-400 font-medium">Signed in as Citizen</p>
+                      <p className="text-xs font-bold text-slate-900 truncate">{citizenUser?.email}</p>
+>>>>>>> second-copy
                     </div>
 
                     <Link
@@ -159,6 +229,7 @@ export const Header = () => {
                       My Profile
                     </Link>
 
+<<<<<<< HEAD
                     {isAdmin && (
                       <Link
                         to="/admin"
@@ -169,6 +240,16 @@ export const Header = () => {
                         Admin Panel
                       </Link>
                     )}
+=======
+                    <Link
+                      to="/your-schemes"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <Bookmark className="w-4 h-4 text-amber-500" />
+                      Your Schemes
+                    </Link>
+>>>>>>> second-copy
 
                     <button
                       onClick={handleLogout}
@@ -184,6 +265,7 @@ export const Header = () => {
               <div className="flex items-center gap-7">
                 <Link
                   to="/login"
+<<<<<<< HEAD
                   className={`relative py-1 text-sm tracking-wide transition-colors group ${
                     isActive('/login') ? 'text-[#0f2942] font-semibold' : 'text-slate-500 font-medium hover:text-[#0f2942]'
                   }`}
@@ -193,6 +275,15 @@ export const Header = () => {
                     className={`absolute bottom-0 left-0 h-[1px] transition-all duration-300 ease-out ${
                       isActive('/login') ? 'w-full bg-[#0f2942]' : 'w-0 bg-[#0f2942] group-hover:w-full'
                     }`}
+=======
+                  className={`relative py-1 text-sm tracking-wide transition-colors group ${isActive('/login') ? 'text-[#0f2942] font-semibold' : 'text-slate-500 font-medium hover:text-[#0f2942]'
+                    }`}
+                >
+                  <span>Sign In</span>
+                  <span
+                    className={`absolute bottom-0 left-0 h-[1px] transition-all duration-300 ease-out ${isActive('/login') ? 'w-full bg-[#0f2942]' : 'w-0 bg-[#0f2942] group-hover:w-full'
+                      }`}
+>>>>>>> second-copy
                   />
                 </Link>
                 <Link
@@ -201,7 +292,11 @@ export const Header = () => {
                 >
                   {/* High Contrast Theme Radiant Beam Layer */}
                   <span className="absolute inset-[-1000%] animate-border-spin bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#38bdf8_25%,#ffffff_50%,#ff9933_75%,transparent_100%)]" />
+<<<<<<< HEAD
                   
+=======
+
+>>>>>>> second-copy
                   {/* Inner Button Fill & Text */}
                   <span className="relative inline-flex items-center justify-center px-4 py-1.5 rounded-3xl bg-[#0f2942] text-sm font-medium tracking-wide text-white group-hover:bg-[#163857] transition-colors">
                     Get Started
@@ -238,7 +333,11 @@ export const Header = () => {
           >
             Browse Schemes
           </Link>
+<<<<<<< HEAD
           {isAuthenticated ? (
+=======
+          {isCitizenAuthenticated ? (
+>>>>>>> second-copy
             <>
               <Link
                 to="/dashboard"
@@ -254,6 +353,7 @@ export const Header = () => {
               >
                 My Profile
               </Link>
+<<<<<<< HEAD
               {isAdmin && (
                 <Link
                   to="/admin"
@@ -263,12 +363,25 @@ export const Header = () => {
                   Admin Panel
                 </Link>
               )}
+=======
+              <Link
+                to="/your-schemes"
+                onClick={() => setMenuOpen(false)}
+                className="block px-3 py-2 text-sm font-medium text-slate-600 hover:text-[#0f2942]"
+              >
+                Your Schemes
+              </Link>
+>>>>>>> second-copy
               <button
                 onClick={() => {
                   setMenuOpen(false);
                   handleLogout();
                 }}
+<<<<<<< HEAD
                 className="w-full text-left px-3 py-2 text-sm font-semibold text-rose-600"
+=======
+                className="w-full text-left px-3 py-2 text-sm font-semibold text-rose-600 cursor-pointer"
+>>>>>>> second-copy
               >
                 Sign Out
               </button>

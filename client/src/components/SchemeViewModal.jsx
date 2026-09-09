@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal } from './Modal';
+<<<<<<< HEAD
 import { Badge } from './Badge';
 import { 
   Building2, 
@@ -13,6 +14,21 @@ import {
   MapPin, 
   Briefcase, 
   GraduationCap, 
+=======
+import { Badge, SchemeStatusBadge } from './Badge';
+import {
+  Building2,
+  IndianRupee,
+  Users,
+  Calendar,
+  ExternalLink,
+  FileCheck,
+  ShieldCheck,
+  CheckCircle2,
+  MapPin,
+  Briefcase,
+  GraduationCap,
+>>>>>>> second-copy
   HeartHandshake,
   PhoneCall,
   Edit,
@@ -24,14 +40,20 @@ import {
 export const SchemeViewModal = ({ isOpen, onClose, scheme, onEdit }) => {
   if (!scheme) return null;
 
+<<<<<<< HEAD
   const isActive = scheme.status === 'Active' || scheme.isActive === true;
   
+=======
+  const isActive = scheme.status ? scheme.status.toLowerCase() === 'active' : Boolean(scheme.isActive);
+
+>>>>>>> second-copy
   // Extract all eligibility bounds safely
   const incomeCeiling = scheme.eligibility?.maxIncome ?? scheme.eligibilityCriteria?.maxIncome ?? 0;
   const minAge = scheme.eligibility?.minAge ?? scheme.eligibilityCriteria?.minAge ?? 0;
   const maxAge = scheme.eligibility?.maxAge ?? scheme.eligibilityCriteria?.maxAge ?? 100;
   const gender = scheme.eligibility?.gender || scheme.eligibilityCriteria?.gender || 'All';
   const targetState = scheme.targetStates ? scheme.targetStates.join(', ') : scheme.state || 'All India';
+<<<<<<< HEAD
   
   const occupationsList = scheme.eligibility?.occupations ? scheme.eligibility.occupations.join(', ') : scheme.eligibilityCriteria?.allowedOccupations ? scheme.eligibilityCriteria.allowedOccupations.join(', ') : 'All Occupations';
   const educationList = scheme.eligibility?.educationLevels ? scheme.eligibility.educationLevels.join(', ') : scheme.eligibilityCriteria?.allowedEducations ? scheme.eligibilityCriteria.allowedEducations.join(', ') : 'All Education Levels';
@@ -51,18 +73,63 @@ export const SchemeViewModal = ({ isOpen, onClose, scheme, onEdit }) => {
     : typeof scheme.benefits === 'string' 
     ? scheme.benefits.split('\n').filter(Boolean) 
     : [];
+=======
+
+  const occupationsList = scheme.eligibility?.occupations ? scheme.eligibility.occupations.join(', ') : scheme.eligibilityCriteria?.allowedOccupations ? scheme.eligibilityCriteria.allowedOccupations.join(', ') : 'All Occupations';
+  const educationList = scheme.eligibility?.educationLevels ? scheme.eligibility.educationLevels.join(', ') : scheme.eligibilityCriteria?.allowedEducations ? scheme.eligibilityCriteria.allowedEducations.join(', ') : 'All Education Levels';
+  const castesList = scheme.eligibility?.castes ? scheme.eligibility.castes.join(', ') : scheme.eligibilityCriteria?.allowedCastes ? scheme.eligibilityCriteria.allowedCastes.join(', ') : 'All Castes';
+
+  const disabilityReq = scheme.eligibility?.disabilityRequired || scheme.eligibilityCriteria?.disabilityRequired ? 'Required / Applicable' : 'Not Required';
+  const bplReq = scheme.eligibility?.bplRequired || scheme.eligibilityCriteria?.bplRequired ? 'Required / BPL Card Holders' : 'Not Required';
+
+  const documents = Array.isArray(scheme.requiredDocuments)
+    ? scheme.requiredDocuments
+    : Array.isArray(scheme.documentsRequired)
+      ? scheme.documentsRequired
+      : [];
+
+  const benefitsList = Array.isArray(scheme.benefits)
+    ? scheme.benefits
+    : typeof scheme.benefits === 'string'
+      ? scheme.benefits.split('\n').filter(Boolean)
+      : [];
+
+  const isNoAge = Boolean(
+    scheme.eligibilityCriteria?.noAgeLimit ||
+    scheme.eligibility?.noAgeLimit ||
+    (scheme.eligibilityCriteria?.minAge === null && scheme.eligibilityCriteria?.maxAge === null) ||
+    (scheme.eligibility?.minAge === null && scheme.eligibility?.maxAge === null)
+  );
+
+  const isNoIncome = Boolean(
+    scheme.eligibilityCriteria?.noIncomeLimit ||
+    scheme.eligibility?.noIncomeLimit ||
+    scheme.eligibilityCriteria?.maxIncome === null ||
+    scheme.eligibility?.maxIncome === null ||
+    scheme.eligibilityCriteria?.maxAnnualIncome === null ||
+    scheme.eligibility?.maxAnnualIncome === null
+  );
+>>>>>>> second-copy
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Government Scheme Comprehensive Audit View" maxWidth="max-w-3xl">
       <div className="space-y-6 text-slate-800 text-xs">
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> second-copy
         {/* Title Header Block */}
         <div className="p-5 rounded-3xl bg-gradient-to-r from-[#f0f6ff] via-white to-[#f4f8fc] border border-blue-100/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
+<<<<<<< HEAD
               <Badge variant={isActive ? 'success' : 'danger'}>
                 {isActive ? 'Active & Live' : 'Inactive / Draft'}
               </Badge>
+=======
+              <SchemeStatusBadge isActive={isActive} status={scheme.status} />
+>>>>>>> second-copy
               <Badge variant="primary">{scheme.category}</Badge>
               {scheme.sponsorType && (
                 <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
@@ -75,9 +142,15 @@ export const SchemeViewModal = ({ isOpen, onClose, scheme, onEdit }) => {
                 </span>
               )}
             </div>
+<<<<<<< HEAD
             
             <h2 className="text-xl font-black text-[#0b2e59] tracking-tight">{scheme.title}</h2>
             
+=======
+
+            <h2 className="text-xl font-black text-[#0b2e59] tracking-tight">{scheme.title}</h2>
+
+>>>>>>> second-copy
             <div className="flex items-center gap-4 text-slate-500 font-medium flex-wrap text-[11px]">
               <div className="flex items-center gap-1.5 text-slate-700 font-bold">
                 <Building2 className="w-3.5 h-3.5 text-[#0052cc]" />
@@ -89,6 +162,20 @@ export const SchemeViewModal = ({ isOpen, onClose, scheme, onEdit }) => {
                   <span>Launched: {scheme.launchDate}</span>
                 </div>
               )}
+<<<<<<< HEAD
+=======
+              {(scheme.lastDate || scheme.applicationLastDate) ? (
+                <div className={`flex items-center gap-1 font-bold ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md border border-rose-200' : 'text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200'}`}>
+                  <Calendar className="w-3.5 h-3.5" />
+                  <span>Last Date: {scheme.lastDate || scheme.applicationLastDate} {new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? '(Expired)' : ''}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-slate-500 font-medium">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Last Date: No Expiry (Ongoing)</span>
+                </div>
+              )}
+>>>>>>> second-copy
               {scheme.viewCount !== undefined && (
                 <div className="flex items-center gap-1">
                   <Eye className="w-3.5 h-3.5 text-slate-400" />
@@ -132,19 +219,31 @@ export const SchemeViewModal = ({ isOpen, onClose, scheme, onEdit }) => {
             <ShieldCheck className="w-3.5 h-3.5 text-[#138808]" />
             <span>Eligibility Requirements Matrix</span>
           </h4>
+<<<<<<< HEAD
           
+=======
+
+>>>>>>> second-copy
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Max Annual Income</span>
               <p className="font-black text-slate-900 text-sm">
+<<<<<<< HEAD
                 ₹{incomeCeiling.toLocaleString('en-IN')} / yr
+=======
+                {isNoIncome ? 'No Income Limit' : `₹${incomeCeiling.toLocaleString('en-IN')} / yr`}
+>>>>>>> second-copy
               </p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase">Eligible Age Range</span>
               <p className="font-black text-slate-900 text-sm">
+<<<<<<< HEAD
                 {minAge} - {maxAge} yrs
+=======
+                {isNoAge ? 'No Age Limit' : `${minAge} - ${maxAge} yrs`}
+>>>>>>> second-copy
               </p>
             </div>
 
