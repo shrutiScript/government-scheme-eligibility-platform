@@ -46,14 +46,6 @@ const schemeSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed, // Can be array of strings or formatted string
       default: ''
     },
-<<<<<<< HEAD
-    eligibilityCriteria: {
-      minAge: { type: Number, default: 0 },
-      maxAge: { type: Number, default: 120 },
-      gender: { type: String, default: 'All' },
-      maxIncome: { type: Number, default: 10000000 },
-      minIncome: { type: Number, default: 0 },
-=======
     code: {
       type: String,
       default: '',
@@ -86,7 +78,6 @@ const schemeSchema = new mongoose.Schema(
       maxAnnualIncome: { type: Number, default: null },
       minIncome: { type: Number, default: 0 },
       gender: { type: String, default: 'All' },
->>>>>>> second-copy
       allowedStates: { type: [String], default: ['All'] },
       allowedOccupations: { type: [String], default: ['All'] },
       allowedEducations: { type: [String], default: ['All'] },
@@ -94,8 +85,6 @@ const schemeSchema = new mongoose.Schema(
       disabilityRequired: { type: Boolean, default: false },
       bplRequired: { type: Boolean, default: false }
     },
-<<<<<<< HEAD
-=======
     // Alternate eligibility shape used by the admin form. Persisted consistently
     // with eligibilityCriteria so both read paths always see the same rules.
     eligibility: {
@@ -106,7 +95,6 @@ const schemeSchema = new mongoose.Schema(
       type: [String],
       default: []
     },
->>>>>>> second-copy
     documentsRequired: {
       type: [String],
       default: []
@@ -128,8 +116,6 @@ const schemeSchema = new mongoose.Schema(
       type: String,
       default: '2019-02-24'
     },
-<<<<<<< HEAD
-=======
     lastDate: {
       type: String,
       default: '',
@@ -140,7 +126,6 @@ const schemeSchema = new mongoose.Schema(
       default: '',
       trim: true
     },
->>>>>>> second-copy
     tags: {
       type: [String],
       default: []
@@ -160,8 +145,6 @@ const schemeSchema = new mongoose.Schema(
   }
 );
 
-<<<<<<< HEAD
-=======
 // Ensure status and isActive are always in sync
 schemeSchema.pre('save', function (next) {
   if (this.isModified('status')) {
@@ -178,7 +161,6 @@ schemeSchema.pre('save', function (next) {
   next();
 });
 
->>>>>>> second-copy
 // Search Index
 schemeSchema.index({ title: 'text', description: 'text', department: 'text', category: 'text', tags: 'text' });
 

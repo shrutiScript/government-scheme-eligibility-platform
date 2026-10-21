@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { Modal } from './Modal';
-import { SCHEME_CATEGORIES, INDIAN_STATES, SPONSOR_TYPES } from '../utils/constants';
-
-export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = false }) => {
-  const isEdit = !!scheme;
-  const { register, handleSubmit, reset, setValue, watch } = useForm();
-
-  useEffect(() => {
-=======
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Modal } from './Modal';
@@ -71,23 +59,11 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
     setErrors({});
     setTouched({});
 
->>>>>>> second-copy
     if (scheme) {
       const activeState = scheme.status === 'Active' || scheme.isActive === true;
       const benefitsText = Array.isArray(scheme.benefits)
         ? scheme.benefits.join('\n')
         : typeof scheme.benefits === 'string'
-<<<<<<< HEAD
-        ? scheme.benefits
-        : '';
-      const docsText = Array.isArray(scheme.requiredDocuments)
-        ? scheme.requiredDocuments.join('\n')
-        : Array.isArray(scheme.documentsRequired)
-        ? scheme.documentsRequired.join('\n')
-        : typeof scheme.requiredDocuments === 'string'
-        ? scheme.requiredDocuments
-        : '';
-=======
           ? scheme.benefits
           : '';
       const docsText = Array.isArray(scheme.requiredDocuments)
@@ -115,7 +91,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
       const rawMinAge = scheme.eligibilityCriteria?.minAge ?? scheme.eligibility?.minAge ?? '';
       const rawMaxAge = scheme.eligibilityCriteria?.maxAge ?? scheme.eligibility?.maxAge ?? '';
       const rawIncome = scheme.eligibilityCriteria?.maxIncome ?? scheme.eligibility?.maxIncome ?? '';
->>>>>>> second-copy
 
       reset({
         title: scheme.title || '',
@@ -132,18 +107,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
         targetState: scheme.targetStates ? scheme.targetStates[0] : scheme.state || 'All',
         isActive: activeState,
 
-<<<<<<< HEAD
-        // Eligibility Rules
-        minAge: scheme.eligibility?.minAge ?? scheme.eligibilityCriteria?.minAge ?? 0,
-        maxAge: scheme.eligibility?.maxAge ?? scheme.eligibilityCriteria?.maxAge ?? 100,
-        maxIncome: scheme.eligibility?.maxIncome ?? scheme.eligibilityCriteria?.maxIncome ?? 500000,
-        disabilityRequired: scheme.eligibility?.disabilityRequired || scheme.eligibilityCriteria?.disabilityRequired ? 'Yes' : 'Any',
-        bplRequired: scheme.eligibility?.bplRequired || scheme.eligibilityCriteria?.bplRequired ? 'Yes' : 'Any',
-        gender: scheme.eligibility?.gender?.includes('All') ? 'All' : (Array.isArray(scheme.eligibility?.gender) ? scheme.eligibility?.gender[0] : scheme.eligibility?.gender) || 'All',
-        occupation: scheme.eligibility?.occupations?.includes('All') ? 'All' : (Array.isArray(scheme.eligibility?.occupations) ? scheme.eligibility?.occupations[0] : 'All'),
-        education: scheme.eligibility?.educationLevels?.includes('All') ? 'All' : (Array.isArray(scheme.eligibility?.educationLevels) ? scheme.eligibility?.educationLevels[0] : 'All'),
-        caste: scheme.eligibility?.castes?.includes('All') ? 'All' : (Array.isArray(scheme.eligibility?.castes) ? scheme.eligibility?.castes[0] : 'All')
-=======
         // Dates
         launchDate: scheme.launchDate || '2019-02-24',
         lastDate: scheme.lastDate || scheme.applicationLastDate || '',
@@ -160,7 +123,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
         occupation: Array.isArray(scheme.eligibilityCriteria?.allowedOccupations) ? (scheme.eligibilityCriteria?.allowedOccupations[0] || 'All') : (Array.isArray(scheme.eligibility?.occupations) ? scheme.eligibility?.occupations[0] : 'All'),
         education: Array.isArray(scheme.eligibilityCriteria?.allowedEducations) ? (scheme.eligibilityCriteria?.allowedEducations[0] || 'All') : (Array.isArray(scheme.eligibility?.educationLevels) ? scheme.eligibility?.educationLevels[0] : 'All'),
         caste: Array.isArray(scheme.eligibilityCriteria?.allowedCastes) ? (scheme.eligibilityCriteria?.allowedCastes[0] || 'All') : (Array.isArray(scheme.eligibility?.castes) ? scheme.eligibility?.castes[0] : 'All')
->>>>>>> second-copy
       });
     } else {
       reset({
@@ -170,11 +132,8 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
         category: 'Agriculture & Farmers',
         sponsorType: 'Central Scheme',
         officialWebsiteUrl: '',
-<<<<<<< HEAD
-=======
         launchDate: new Date().toISOString().split('T')[0],
         lastDate: '',
->>>>>>> second-copy
         shortDescription: '',
         detailedDescription: '',
         benefits: 'Direct financial assistance\nSubsidized inputs',
@@ -182,15 +141,10 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
         requiredDocuments: 'Aadhaar Card\nIncome Certificate\nBank Passbook',
         targetState: 'All',
         isActive: true,
-<<<<<<< HEAD
-        minAge: 18,
-        maxAge: 70,
-=======
         noAgeLimit: false,
         minAge: 18,
         maxAge: 70,
         noIncomeLimit: false,
->>>>>>> second-copy
         maxIncome: 250000,
         disabilityRequired: 'Any',
         bplRequired: 'Any',
@@ -202,35 +156,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
     }
   }, [scheme, reset, isOpen]);
 
-<<<<<<< HEAD
-  const onSubmitForm = (data) => {
-    const formattedData = {
-      title: data.title,
-      code: data.code,
-      department: data.department,
-      category: data.category,
-      sponsorType: data.sponsorType,
-      officialWebsiteUrl: data.officialWebsiteUrl,
-      shortDescription: data.shortDescription,
-      description: data.detailedDescription || data.shortDescription,
-      detailedDescription: data.detailedDescription,
-      benefits: data.benefits ? data.benefits.split('\n').filter((line) => line.trim()) : [],
-      applicationProcess: data.applicationProcess,
-      requiredDocuments: data.requiredDocuments ? data.requiredDocuments.split('\n').filter((line) => line.trim()) : [],
-      documentsRequired: data.requiredDocuments ? data.requiredDocuments.split('\n').filter((line) => line.trim()) : [],
-      targetStates: [data.targetState],
-      state: data.targetState === 'All' ? 'All India' : data.targetState,
-      isActive: Boolean(data.isActive),
-      status: data.isActive ? 'Active' : 'Inactive',
-      eligibility: {
-        minAge: Number(data.minAge),
-        maxAge: Number(data.maxAge),
-        maxIncome: Number(data.maxIncome),
-        gender: data.gender === 'All' ? ['All'] : [data.gender],
-        occupations: data.occupation === 'All' ? ['All'] : [data.occupation],
-        educationLevels: data.education === 'All' ? ['All'] : [data.education],
-        castes: data.caste === 'All' ? ['All'] : [data.caste],
-=======
   // Field validation function
   const validateField = (name, value, allValues = {}) => {
     let error = '';
@@ -496,21 +421,10 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
         allowedOccupations: data.occupation === 'All' ? ['All'] : [data.occupation],
         allowedEducations: data.education === 'All' ? ['All'] : [data.education],
         allowedCastes: data.caste === 'All' ? ['All'] : [data.caste],
->>>>>>> second-copy
         allowedStates: data.targetState === 'All' ? ['All'] : [data.targetState],
         disabilityRequired: data.disabilityRequired === 'Yes',
         bplRequired: data.bplRequired === 'Yes'
       },
-<<<<<<< HEAD
-      eligibilityCriteria: {
-        minAge: Number(data.minAge),
-        maxAge: Number(data.maxAge),
-        maxIncome: Number(data.maxIncome),
-        gender: data.gender,
-        allowedOccupations: data.occupation === 'All' ? ['All'] : [data.occupation],
-        allowedEducations: data.education === 'All' ? ['All'] : [data.education],
-        allowedCastes: data.caste === 'All' ? ['All'] : [data.caste],
-=======
       eligibility: {
         noAgeLimit: isNoAge,
         minAge: minAge,
@@ -522,7 +436,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
         occupations: data.occupation === 'All' ? ['All'] : [data.occupation],
         educationLevels: data.education === 'All' ? ['All'] : [data.education],
         castes: data.caste === 'All' ? ['All'] : [data.caste],
->>>>>>> second-copy
         allowedStates: data.targetState === 'All' ? ['All'] : [data.targetState],
         disabilityRequired: data.disabilityRequired === 'Yes',
         bplRequired: data.bplRequired === 'Yes'
@@ -532,8 +445,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
     onSave(formattedData);
   };
 
-<<<<<<< HEAD
-=======
   const getFieldClass = (fieldName) => {
     const hasError = errors[fieldName] && touched[fieldName];
     return `w-full px-3.5 py-2.5 rounded-xl border text-xs font-medium text-slate-800 outline-none transition-all ${
@@ -543,7 +454,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
     }`;
   };
 
->>>>>>> second-copy
   return (
     <Modal
       isOpen={isOpen}
@@ -551,17 +461,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
       title={isEdit ? 'Edit Government Scheme' : 'Add New Government Scheme'}
       maxWidth="max-w-4xl"
     >
-<<<<<<< HEAD
-      <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
-        {/* Basic Scheme Information */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-bold text-blue-900 uppercase tracking-wider border-b pb-1">
-            1. Basic Scheme Information
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-=======
       <form onSubmit={handleSubmit(onSubmitForm)} noValidate className="space-y-6">
         
         {/* ================================================================= */}
@@ -579,20 +478,10 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
             {/* Scheme Title */}
             <div className="space-y-1">
               <label className="block text-xs font-bold text-slate-700">
->>>>>>> second-copy
                 Scheme Title *
               </label>
               <input
                 type="text"
-<<<<<<< HEAD
-                {...register('title', { required: true })}
-                placeholder="e.g. Pradhan Mantri Kisan Samman Nidhi"
-                className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-=======
                 name="title"
                 placeholder="e.g. Pradhan Mantri Kisan Samman Nidhi"
                 {...register('title')}
@@ -611,17 +500,10 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
             {/* Scheme Code / Acronym */}
             <div className="space-y-1">
               <label className="block text-xs font-bold text-slate-700">
->>>>>>> second-copy
                 Scheme Code / Acronym
               </label>
               <input
                 type="text"
-<<<<<<< HEAD
-                {...register('code')}
-                placeholder="e.g. PM-KISAN"
-                className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-=======
                 name="code"
                 placeholder="e.g. PM-KISAN"
                 {...register('code')}
@@ -635,38 +517,17 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
                   <span>{errors.code}</span>
                 </p>
               )}
->>>>>>> second-copy
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-<<<<<<< HEAD
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-=======
             {/* Nodal Department */}
             <div className="space-y-1">
               <label className="block text-xs font-bold text-slate-700">
->>>>>>> second-copy
                 Nodal Department *
               </label>
               <input
                 type="text"
-<<<<<<< HEAD
-                {...register('department', { required: true })}
-                placeholder="e.g. Ministry of Agriculture"
-                className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Category *
-              </label>
-              <select
-                {...register('category')}
-                className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-=======
                 name="department"
                 placeholder="e.g. Ministry of Agriculture"
                 {...register('department')}
@@ -693,7 +554,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
                 onChange={(e) => handleInputChange('category', e.target.value)}
                 onBlur={(e) => handleBlur('category', e.target.value)}
                 className={getFieldClass('category')}
->>>>>>> second-copy
               >
                 {SCHEME_CATEGORIES.filter((c) => c !== 'All').map((cat) => (
                   <option key={cat} value={cat}>
@@ -701,17 +561,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
                   </option>
                 ))}
               </select>
-<<<<<<< HEAD
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Sponsor Type
-              </label>
-              <select
-                {...register('sponsorType')}
-                className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-=======
               {errors.category && touched.category && (
                 <p className="text-xs text-red-600 font-semibold flex items-center gap-1 animate-fade-in mt-1">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -731,7 +580,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
                 onChange={(e) => handleInputChange('sponsorType', e.target.value)}
                 onBlur={(e) => handleBlur('sponsorType', e.target.value)}
                 className={getFieldClass('sponsorType')}
->>>>>>> second-copy
               >
                 {SPONSOR_TYPES.map((type) => (
                   <option key={type} value={type}>
@@ -739,75 +587,6 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
                   </option>
                 ))}
               </select>
-<<<<<<< HEAD
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Official Website URL
-            </label>
-            <input
-              type="url"
-              {...register('officialWebsiteUrl')}
-              placeholder="https://pmkisan.gov.in"
-              className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-          </div>
-        </div>
-
-        {/* Descriptions & Content */}
-        <div className="space-y-4">
-          <h4 className="text-sm font-bold text-blue-900 uppercase tracking-wider border-b pb-1">
-            2. Descriptions & Process
-          </h4>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Short Summary Description *
-            </label>
-            <textarea
-              {...register('shortDescription', { required: true })}
-              rows={2}
-              placeholder="Brief 1-2 sentence overview for scheme card display"
-              className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Detailed Description
-            </label>
-            <textarea
-              {...register('detailedDescription')}
-              rows={3}
-              placeholder="Comprehensive details about objectives, target audience, and scope"
-              className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Key Benefits (One per line)
-              </label>
-              <textarea
-                {...register('benefits')}
-                rows={3}
-                placeholder="Direct Bank Transfer ₹6,000 per year&#10;Paid in 3 equal installments"
-                className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Required Documents (One per line)
-              </label>
-              <textarea
-                {...register('requiredDocuments')}
-                rows={3}
-                placeholder="Aadhaar Card&#10;Land Ownership Record&#10;Bank Passbook"
-                className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-=======
               {errors.sponsorType && touched.sponsorType && (
                 <p className="text-xs text-red-600 font-semibold flex items-center gap-1 animate-fade-in mt-1">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -965,121 +744,11 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
                 placeholder="Aadhaar Card&#10;Income Certificate&#10;Bank Passbook"
                 {...register('requiredDocuments')}
                 className={getFieldClass('requiredDocuments')}
->>>>>>> second-copy
               />
             </div>
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Eligibility Engine Rules */}
-        <div className="space-y-4 bg-amber-50/60 p-4 rounded-xl border border-amber-200">
-          <h4 className="text-sm font-bold text-amber-900 uppercase tracking-wider border-b border-amber-200 pb-1">
-            3. Automated Eligibility Criteria Engine Bounds
-          </h4>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Minimum Age (Years)</label>
-              <input
-                type="number"
-                {...register('minAge')}
-                className="w-full px-3 py-2 border rounded-xl text-sm bg-white"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Maximum Age (Years)</label>
-              <input
-                type="number"
-                {...register('maxAge')}
-                className="w-full px-3 py-2 border rounded-xl text-sm bg-white"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Max Annual Income Ceiling (₹)</label>
-              <input
-                type="number"
-                {...register('maxIncome')}
-                className="w-full px-3 py-2 border rounded-xl text-sm bg-white"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Gender</label>
-              <select {...register('gender')} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
-                <option value="All">All Genders</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Occupation</label>
-              <select {...register('occupation')} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
-                <option value="All">All Occupations</option>
-                <option value="Farmer">Farmer</option>
-                <option value="Student">Student</option>
-                <option value="Self-Employed">Self-Employed</option>
-                <option value="Unemployed">Unemployed</option>
-                <option value="Salaried">Salaried</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Target Caste</label>
-              <select {...register('caste')} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
-                <option value="All">All Categories</option>
-                <option value="General">General</option>
-                <option value="OBC">OBC</option>
-                <option value="SC">SC</option>
-                <option value="ST">ST</option>
-                <option value="EWS">EWS</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Target State</label>
-              <select {...register('targetState')} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
-                {INDIAN_STATES.map((st) => (
-                  <option key={st} value={st}>
-                    {st}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Disability Required</label>
-              <select {...register('disabilityRequired')} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
-                <option value="Any">Any / No Restriction</option>
-                <option value="Yes">Must be Person with Disability (PwD)</option>
-                <option value="No">Non-Disabled Only</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">BPL Status Required</label>
-              <select {...register('bplRequired')} className="w-full px-3 py-2 border rounded-xl text-sm bg-white">
-                <option value="Any">Any / No Restriction</option>
-                <option value="Yes">Must possess BPL Ration Card</option>
-                <option value="No">Non-BPL Only</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2 pt-6">
-              <input
-                type="checkbox"
-                id="isActiveCheck"
-                {...register('isActive')}
-                className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
-              />
-              <label htmlFor="isActiveCheck" className="text-xs font-semibold text-slate-800 cursor-pointer">
-                Scheme Active & Publicly Visible
-=======
         {/* ================================================================= */}
         {/* 3. AUTOMATED ELIGIBILITY CRITERIA BOUNDS                          */}
         {/* ================================================================= */}
@@ -1361,38 +1030,24 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
                   {...register('isActive')}
                   className="w-4 h-4 rounded text-[#0c2338] focus:ring-[#0c2338] cursor-pointer flex-shrink-0"
                 />
->>>>>>> second-copy
               </label>
             </div>
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Buttons */}
-=======
         {/* Action Buttons */}
->>>>>>> second-copy
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
           <button
             type="button"
             onClick={onClose}
-<<<<<<< HEAD
-            className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-sm font-semibold transition-colors cursor-pointer"
-=======
             disabled={loading}
             className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
->>>>>>> second-copy
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-<<<<<<< HEAD
-            className="px-6 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold shadow-md transition-colors cursor-pointer disabled:opacity-50"
-          >
-            {loading ? 'Saving...' : isEdit ? 'Update Scheme' : 'Publish Scheme'}
-=======
             className="px-6 py-2.5 rounded-xl bg-[#0c2338] hover:bg-[#071928] text-white text-xs font-black shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60"
           >
             {loading ? (
@@ -1403,15 +1058,11 @@ export const SchemeModal = ({ isOpen, onClose, onSave, scheme = null, loading = 
             ) : (
               <span>{isEdit ? 'Update Scheme' : 'Publish Scheme'}</span>
             )}
->>>>>>> second-copy
           </button>
         </div>
       </form>
     </Modal>
   );
 };
-<<<<<<< HEAD
-=======
 
 export default SchemeModal;
->>>>>>> second-copy

@@ -4,10 +4,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import { seedSchemesIfEmpty } from './utils/seedSchemes.js';
 import { seedAdminUser } from './utils/seedAdmin.js';
-<<<<<<< HEAD
-=======
 import { verifyEmailConnection } from './utils/emailService.js';
->>>>>>> second-copy
 import { errorHandler } from './middleware/errorHandler.js';
 
 import authRoutes from './routes/authRoutes.js';
@@ -16,12 +13,6 @@ import schemeRoutes from './routes/schemeRoutes.js';
 import eligibilityRoutes from './routes/eligibilityRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 
-<<<<<<< HEAD
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 5000;
-=======
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -33,7 +24,6 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5002;
->>>>>>> second-copy
 
 // Body Parser Middleware
 app.use(express.json({ limit: '10mb' }));
@@ -83,21 +73,14 @@ const startServer = async () => {
     await connectDB();
     await seedAdminUser();
     await seedSchemesIfEmpty();
-<<<<<<< HEAD
-
-    app.listen(PORT, () => {
-=======
     await verifyEmailConnection();
 
     const server = app.listen(PORT, () => {
->>>>>>> second-copy
       console.log(`===================================================`);
       console.log(` 🚀 SchemeSetu Backend Server active on port ${PORT}`);
       console.log(` 📍 API Base URL: http://localhost:${PORT}/api`);
       console.log(`===================================================`);
     });
-<<<<<<< HEAD
-=======
 
     server.on('error', (err) => {
       if (err.code === 'EADDRINUSE') {
@@ -108,19 +91,14 @@ const startServer = async () => {
       }
       process.exit(1);
     });
->>>>>>> second-copy
   } catch (error) {
     console.error('[Fatal Error] Failed to start backend server:', error);
     process.exit(1);
   }
 };
 
-<<<<<<< HEAD
-startServer();
-=======
 export { app, startServer };
 
 if (process.argv[1] && process.argv[1].endsWith('server.js')) {
   startServer();
 }
->>>>>>> second-copy

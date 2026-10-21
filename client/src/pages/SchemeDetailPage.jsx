@@ -5,17 +5,6 @@ import { eligibilityService } from '../services/eligibilityService';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { Badge, MatchBadge } from '../components/Badge';
-<<<<<<< HEAD
-import { 
-  Building2, 
-  CheckCircle2, 
-  FileText, 
-  ExternalLink, 
-  ShieldCheck, 
-  ArrowLeft, 
-  Clock, 
-  Users, 
-=======
 import {
   Building2,
   CheckCircle2,
@@ -25,7 +14,6 @@ import {
   ArrowLeft,
   Clock,
   Users,
->>>>>>> second-copy
   AlertCircle,
   Sparkles,
   PhoneCall,
@@ -34,10 +22,7 @@ import {
   IndianRupee,
   MapPin,
   Briefcase,
-<<<<<<< HEAD
-=======
   Layers,
->>>>>>> second-copy
   HelpCircle,
   Info
 } from 'lucide-react';
@@ -106,25 +91,18 @@ export const SchemeDetailPage = () => {
       }
     };
 
-<<<<<<< HEAD
-=======
     if (!id || id.toLowerCase() === 'all') {
       navigate('/schemes', { replace: true });
       return;
     }
 
->>>>>>> second-copy
     if (id) {
       fetchSchemeDetails();
     } else {
       setLoading(false);
       setError('Invalid Scheme ID');
     }
-<<<<<<< HEAD
-  }, [id]);
-=======
   }, [id, navigate]);
->>>>>>> second-copy
 
   const runEligibilityCheck = useCallback(async () => {
     setEvaluating(true);
@@ -231,13 +209,8 @@ export const SchemeDetailPage = () => {
   const benefitsList = Array.isArray(scheme.benefits)
     ? scheme.benefits
     : scheme.benefits
-<<<<<<< HEAD
-    ? [scheme.benefits]
-    : [];
-=======
       ? [scheme.benefits]
       : [];
->>>>>>> second-copy
 
   const docsList = scheme.documentsRequired || scheme.requiredDocuments || [];
   const tagsList = scheme.tags || [];
@@ -293,14 +266,6 @@ export const SchemeDetailPage = () => {
               {scheme.state || 'All India'}
             </span>
             {scheme.status && (
-<<<<<<< HEAD
-              <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${
-                scheme.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
-              }`}>
-                ● {scheme.status}
-              </span>
-            )}
-=======
               <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${scheme.status === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'
                 }`}>
                 ● {scheme.status}
@@ -311,7 +276,6 @@ export const SchemeDetailPage = () => {
                 <Clock className="w-3.5 h-3.5 text-rose-600" /> Application Deadline Expired
               </span>
             )}
->>>>>>> second-copy
           </div>
 
           {matchResult && (
@@ -336,11 +300,7 @@ export const SchemeDetailPage = () => {
         </p>
 
         {/* Key Info Chips */}
-<<<<<<< HEAD
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 items-start">
-=======
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-2 items-start">
->>>>>>> second-copy
           {scheme.benefitAmount && (
             <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 flex items-start gap-3">
               <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
@@ -368,8 +328,6 @@ export const SchemeDetailPage = () => {
               </div>
             </div>
           )}
-<<<<<<< HEAD
-=======
 
           {(scheme.lastDate || scheme.applicationLastDate) && (
             <div className={`p-3.5 rounded-2xl border flex items-start gap-3 ${new Date(scheme.lastDate || scheme.applicationLastDate).getTime() < new Date().setHours(0, 0, 0, 0) ? 'bg-rose-50/80 border-rose-200/80' : 'bg-blue-50/80 border-blue-200/80'}`}>
@@ -386,7 +344,6 @@ export const SchemeDetailPage = () => {
               </div>
             </div>
           )}
->>>>>>> second-copy
         </div>
 
         {/* Action Row */}
@@ -436,11 +393,7 @@ export const SchemeDetailPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column (2 Cols): Benefits, Application Process, Required Documents & Helpline */}
         <div className="lg:col-span-2 space-y-8">
-<<<<<<< HEAD
-          
-=======
 
->>>>>>> second-copy
           {/* Key Benefits */}
           <div className="surface-card p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
             <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2.5 border-b border-slate-100 pb-4">
@@ -522,68 +475,6 @@ export const SchemeDetailPage = () => {
 
         {/* Right Sidebar: Eligibility Criteria Matrix */}
         <aside className="space-y-6">
-<<<<<<< HEAD
-          <div className="surface-card p-6 rounded-3xl bg-[#0f2942] text-white space-y-5 border border-slate-800 shadow-lg">
-            <div className="flex items-center gap-2 border-b border-slate-700/80 pb-3">
-              <Info className="w-4 h-4 text-[#e07a10]" />
-              <h3 className="text-xs font-extrabold text-slate-200 uppercase tracking-wider">
-                Eligibility Criteria Matrix
-              </h3>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between py-2 border-b border-slate-700/50">
-                <span className="text-slate-400 font-medium">Age Limit:</span>
-                <span className="font-bold text-white">
-                  {criteria.minAge ?? 0} - {criteria.maxAge ?? 120} Years
-                </span>
-              </div>
-
-              <div className="flex justify-between py-2 border-b border-slate-700/50">
-                <span className="text-slate-400 font-medium">Max Annual Income:</span>
-                <span className="font-bold text-emerald-400">
-                  ₹{(criteria.maxIncome ?? 10000000).toLocaleString('en-IN')} / Yr
-                </span>
-              </div>
-
-              <div className="flex justify-between py-2 border-b border-slate-700/50">
-                <span className="text-slate-400 font-medium">Target Gender:</span>
-                <span className="font-bold text-white">{criteria.gender || 'All'}</span>
-              </div>
-
-              <div className="flex justify-between py-2 border-b border-slate-700/50">
-                <span className="text-slate-400 font-medium">Target State:</span>
-                <span className="font-bold text-white">
-                  {Array.isArray(criteria.allowedStates) ? criteria.allowedStates.join(', ') : scheme.state || 'All India'}
-                </span>
-              </div>
-
-              <div className="flex justify-between py-2 border-b border-slate-700/50">
-                <span className="text-slate-400 font-medium">Occupations:</span>
-                <span className="font-bold text-white">
-                  {Array.isArray(criteria.allowedOccupations) ? criteria.allowedOccupations.join(', ') : 'All'}
-                </span>
-              </div>
-
-              <div className="flex justify-between py-2 border-b border-slate-700/50">
-                <span className="text-slate-400 font-medium">Castes / Social:</span>
-                <span className="font-bold text-white">
-                  {Array.isArray(criteria.allowedCastes) ? criteria.allowedCastes.join(', ') : 'All'}
-                </span>
-              </div>
-
-              <div className="flex justify-between py-2 border-b border-slate-700/50">
-                <span className="text-slate-400 font-medium">Disability (PwD) Req:</span>
-                <span className="font-bold text-white">
-                  {criteria.disabilityRequired ? 'Yes (Mandatory)' : 'No'}
-                </span>
-              </div>
-
-              <div className="flex justify-between py-2">
-                <span className="text-slate-400 font-medium">BPL Status Req:</span>
-                <span className="font-bold text-white">
-                  {criteria.bplRequired ? 'Yes (Mandatory)' : 'No'}
-=======
           <div className="surface-card rounded-3xl bg-white border border-slate-200/90 shadow-md overflow-hidden transition-all">
             {/* Header with Dark Navy Background */}
             <div className="p-5 bg-[#0f2942] text-white space-y-1">
@@ -603,15 +494,10 @@ export const SchemeDetailPage = () => {
                 </div>
                 <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-bold tracking-wide">
                   Verified
->>>>>>> second-copy
                 </span>
               </div>
             </div>
 
-<<<<<<< HEAD
-            <div className="pt-2 border-t border-slate-700/80 text-[11px] text-slate-400 text-center font-medium">
-              Official Government Criteria verification active
-=======
             {/* Matrix Body */}
             <div className="p-5 space-y-4 text-xs">
               {/* Age Limit */}
@@ -740,7 +626,6 @@ export const SchemeDetailPage = () => {
             <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-center gap-2 text-xs font-bold text-slate-600">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Official Government Criteria Active</span>
->>>>>>> second-copy
             </div>
           </div>
         </aside>

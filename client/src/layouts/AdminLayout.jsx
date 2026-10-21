@@ -5,11 +5,7 @@ import { AdminHeader } from '../components/AdminHeader';
 import { ToastContainer } from '../components/Toast';
 
 export const AdminLayout = () => {
-<<<<<<< HEAD
-  const { user, loading, isAdmin } = useAuth();
-=======
   const { adminUser, loading, isAdmin } = useAuth();
->>>>>>> second-copy
 
   if (loading) {
     return (
@@ -19,11 +15,7 @@ export const AdminLayout = () => {
     );
   }
 
-<<<<<<< HEAD
-  if (!user || !isAdmin) {
-=======
   if (!adminUser || !isAdmin || adminUser.role !== 'admin') {
->>>>>>> second-copy
     return <Navigate to="/login" replace />;
   }
 

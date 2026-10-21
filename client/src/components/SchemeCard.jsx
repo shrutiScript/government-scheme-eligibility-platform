@@ -1,15 +1,9 @@
-<<<<<<< HEAD
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { MatchBadge } from './Badge';
-=======
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MatchBadge } from './Badge';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
 import { userService } from '../services/userService';
->>>>>>> second-copy
 import { 
   Building2, 
   Bookmark,
@@ -27,10 +21,6 @@ const CATEGORY_META = {
   'Employment & Skill Development': { emoji: '💼', label: 'Employment', bg: 'bg-indigo-50 text-indigo-700 border-indigo-200' }
 };
 
-<<<<<<< HEAD
-export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false, index = 0 }) => {
-  const [saved, setSaved] = useState(false);
-=======
 export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false, index = 0, isInitiallySaved = false }) => {
   const { citizenUser, isCitizenAuthenticated, updateUserState, updateSavedSchemes } = useAuth();
   const { notifySuccess, notifyError, notifyWarning } = useNotification();
@@ -92,7 +82,6 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
       setSaving(false);
     }
   };
->>>>>>> second-copy
 
   // Category Metadata
   const catMeta = CATEGORY_META[scheme.category] || { 
@@ -127,21 +116,6 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
             {/* Bookmark Icon */}
             <button
               type="button"
-<<<<<<< HEAD
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setSaved(!saved);
-              }}
-              title={saved ? 'Remove bookmark' : 'Bookmark scheme'}
-              className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-200 cursor-pointer ${
-                saved 
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700 shadow-xs' 
-                  : 'border-[#E5E7EB] text-slate-400 hover:text-emerald-700 hover:bg-emerald-50/80 hover:border-emerald-200'
-              }`}
-            >
-              <Bookmark className={`w-4 h-4 transition-transform duration-200 ${saved ? 'fill-emerald-700 scale-110' : ''}`} />
-=======
               onClick={handleToggleBookmark}
               disabled={saving}
               title={saved ? 'Remove from Your Schemes' : 'Save to Your Schemes'}
@@ -152,7 +126,6 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
               }`}
             >
               <Bookmark className={`w-4 h-4 transition-transform duration-200 ${saved ? 'fill-amber-500 text-amber-600 scale-110' : ''}`} />
->>>>>>> second-copy
             </button>
           </div>
         </div>
@@ -205,10 +178,6 @@ export const SchemeCard = ({ scheme, matchResult, showEligibilityDetails = false
           <Eye className="w-4 h-4 text-slate-700 shrink-0 stroke-[2.2]" />
           <span>View Details</span>
         </Link>
-<<<<<<< HEAD
-
-=======
->>>>>>> second-copy
         {/* Right Button: Apply Now → */}
         {scheme.officialWebsiteUrl ? (
           <a

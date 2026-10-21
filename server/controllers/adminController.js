@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-import User from '../models/User.js';
-import Scheme from '../models/Scheme.js';
-=======
 import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Scheme from '../models/Scheme.js';
 import ActivityLog from '../models/ActivityLog.js';
 import { logActivity, pruneActivityLogs } from '../utils/activityLogger.js';
->>>>>>> second-copy
 
 // @desc    Get administrative dashboard statistics
 // @route   GET /api/admin/stats
@@ -24,21 +19,6 @@ export const getStats = async (req, res, next) => {
     const viewsAgg = await Scheme.aggregate([
       { $group: { _id: null, totalViews: { $sum: '$viewCount' } } }
     ]);
-<<<<<<< HEAD
-    const totalViews = viewsAgg[0]?.totalViews || 0;
-
-    // Fetch 6 most recently added schemes for overview panel
-    const recentSchemes = await Scheme.find()
-      .sort({ createdAt: -1 })
-      .limit(6)
-      .select('title department category status isActive createdAt viewCount');
-
-    // Fetch 6 most recently registered users for overview panel
-    const recentUsers = await User.find()
-      .sort({ createdAt: -1 })
-      .limit(6)
-      .select('name email role isBlocked state occupation createdAt');
-=======
     const totalViews = viewsAgg.length > 0 ? viewsAgg[0].totalViews : 0;
 
     // Recent Schemes (last 5)
@@ -89,7 +69,6 @@ export const getStats = async (req, res, next) => {
       },
       { $sort: { total: -1 } }
     ]);
->>>>>>> second-copy
 
     return res.status(200).json({
       success: true,
@@ -99,15 +78,10 @@ export const getStats = async (req, res, next) => {
         activeSchemes,
         inactiveSchemes,
         adminCount,
-<<<<<<< HEAD
-        totalViews,
-        totalApplications: Math.round(totalViews * 0.42)
-=======
         citizenCount: totalUsers - adminCount,
         totalViews,
         totalApplications: Math.round(totalViews * 0.42),
         categoryDistribution
->>>>>>> second-copy
       },
       recentSchemes,
       recentUsers
@@ -117,9 +91,6 @@ export const getStats = async (req, res, next) => {
   }
 };
 
-<<<<<<< HEAD
-// @desc    Get user list
-=======
 // @desc    Get system activity logs (strictly max 20 records)
 // @route   GET /api/admin/logs
 // @access  Private / Admin
@@ -142,17 +113,10 @@ export const getLogs = async (req, res, next) => {
 };
 
 // @desc    Get user list with search, role filter, status filter, sorting & pagination
->>>>>>> second-copy
 // @route   GET /api/admin/users
 // @access  Private / Admin
 export const getUsers = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    const users = await User.find().select('-password').sort({ createdAt: -1 });
-    return res.status(200).json({
-      success: true,
-      count: users.length,
-=======
     const page = parseInt(req.query.page, 10) || 1;
     const limit = parseInt(req.query.limit, 10) || 50;
     const skip = (page - 1) * limit;
@@ -230,7 +194,6 @@ export const getUsers = async (req, res, next) => {
       total,
       page,
       pages: Math.ceil(total / limit) || 1,
->>>>>>> second-copy
       users
     });
   } catch (error) {
@@ -243,9 +206,6 @@ export const getUsers = async (req, res, next) => {
 // @access  Private / Admin
 export const updateUserRole = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    const { role } = req.body;
-=======
     const { userId } = req.params;
     const { role } = req.body;
 
@@ -256,7 +216,6 @@ export const updateUserRole = async (req, res, next) => {
       });
     }
 
->>>>>>> second-copy
     if (!['user', 'admin'].includes(role)) {
       return res.status(400).json({
         success: false,
@@ -265,22 +224,14 @@ export const updateUserRole = async (req, res, next) => {
     }
 
     // Safety policy: Admin cannot demote their own account role
-<<<<<<< HEAD
-    if (req.user._id.toString() === req.params.userId.toString()) {
-=======
     if (req.user._id.toString() === userId.toString()) {
->>>>>>> second-copy
       return res.status(403).json({
         success: false,
         message: 'Security Policy: You cannot modify or demote your own admin account role.'
       });
     }
 
-<<<<<<< HEAD
-    const user = await User.findById(req.params.userId);
-=======
     const user = await User.findById(userId);
->>>>>>> second-copy
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -291,8 +242,6 @@ export const updateUserRole = async (req, res, next) => {
     user.role = role;
     await user.save();
 
-<<<<<<< HEAD
-=======
     const adminName = req.user?.name || req.user?.email || 'Admin';
     await logActivity({
       action: 'UPDATE USER ROLE',
@@ -300,7 +249,6 @@ export const updateUserRole = async (req, res, next) => {
       details: `Admin "${adminName}" changed role of "${user.name}" (${user.email}) to ${role}.`
     });
 
->>>>>>> second-copy
     return res.status(200).json({
       success: true,
       message: `User role updated to ${role}`,
@@ -316,9 +264,6 @@ export const updateUserRole = async (req, res, next) => {
 // @access  Private / Admin
 export const toggleBlockUser = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    if (req.user._id.toString() === req.params.userId.toString()) {
-=======
     const { userId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -329,18 +274,13 @@ export const toggleBlockUser = async (req, res, next) => {
     }
 
     if (req.user._id.toString() === userId.toString()) {
->>>>>>> second-copy
       return res.status(403).json({
         success: false,
         message: 'Security Policy: Admin cannot block their own account.'
       });
     }
 
-<<<<<<< HEAD
-    const user = await User.findById(req.params.userId);
-=======
     const user = await User.findById(userId);
->>>>>>> second-copy
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -355,11 +295,6 @@ export const toggleBlockUser = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-    user.isBlocked = !user.isBlocked;
-    await user.save();
-
-=======
     const previousStatus = user.isBlocked ? 'BLOCKED' : 'ACTIVE';
     const newStatus = user.isBlocked ? 'ACTIVE' : 'BLOCKED';
 
@@ -389,7 +324,6 @@ export const toggleBlockUser = async (req, res, next) => {
       }
     });
 
->>>>>>> second-copy
     return res.status(200).json({
       success: true,
       message: `User ${user.name} has been ${user.isBlocked ? 'blocked / suspended' : 'unblocked'}.`,
@@ -405,10 +339,6 @@ export const toggleBlockUser = async (req, res, next) => {
 // @access  Private / Admin
 export const deleteUser = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    // Safety policy: Admin cannot delete their own account
-    if (req.user._id.toString() === req.params.userId.toString()) {
-=======
     const { userId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -420,18 +350,13 @@ export const deleteUser = async (req, res, next) => {
 
     // Safety policy: Admin cannot delete their own account
     if (req.user._id.toString() === userId.toString()) {
->>>>>>> second-copy
       return res.status(403).json({
         success: false,
         message: 'Security Policy: Admin accounts cannot delete their own account.'
       });
     }
 
-<<<<<<< HEAD
-    const targetUser = await User.findById(req.params.userId);
-=======
     const targetUser = await User.findById(userId);
->>>>>>> second-copy
     if (!targetUser) {
       return res.status(404).json({
         success: false,
@@ -446,13 +371,6 @@ export const deleteUser = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-    await User.findByIdAndDelete(req.params.userId);
-
-    return res.status(200).json({
-      success: true,
-      message: 'User account deleted successfully'
-=======
     await User.findByIdAndDelete(userId);
 
     const adminName = req.user?.name || req.user?.email || 'Admin';
@@ -518,7 +436,6 @@ export const updateUser = async (req, res, next) => {
       success: true,
       message: `User "${user.name}" updated successfully.`,
       user: user.toJSON()
->>>>>>> second-copy
     });
   } catch (error) {
     next(error);

@@ -43,8 +43,6 @@ export const MatchBadge = ({ percentage = 0, isEligible = true }) => {
     </Badge>
   );
 };
-<<<<<<< HEAD
-=======
 
 export const SchemeStatusBadge = ({ isActive, status, className = '' }) => {
   const isSchemeActive = status
@@ -71,4 +69,3 @@ export const SchemeStatusBadge = ({ isActive, status, className = '' }) => {
     </span>
   );
 };
->>>>>>> second-copy

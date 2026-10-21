@@ -1,44 +1,25 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from 'react';
-=======
 import React, { useState, useEffect, useCallback } from 'react';
->>>>>>> second-copy
 import { useSearchParams } from 'react-router-dom';
 import { schemeService } from '../services/schemeService';
 import { SchemeCard } from '../components/SchemeCard';
 import { Pagination } from '../components/Pagination';
-<<<<<<< HEAD
-import { Search, Filter, RefreshCw } from 'lucide-react';
-=======
 import { Search, Filter, RefreshCw, SlidersHorizontal, ArrowUpDown, X } from 'lucide-react';
->>>>>>> second-copy
 import { SCHEME_CATEGORIES, INDIAN_STATES } from '../utils/constants';
 import { PageMotionWrapper } from '../components/PageMotionWrapper';
 
 export const SchemesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'All';
-<<<<<<< HEAD
-=======
   const initialSearch = searchParams.get('search') || '';
->>>>>>> second-copy
 
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-<<<<<<< HEAD
-  // Filter States
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState(initialCategory);
-  const [stateFilter, setStateFilter] = useState('All');
-  const [occupation, setOccupation] = useState('All');
-=======
   // Filter & Search States
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState(initialCategory);
   const [stateFilter, setStateFilter] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
->>>>>>> second-copy
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalSchemes, setTotalSchemes] = useState(0);
@@ -48,29 +29,6 @@ export const SchemesPage = () => {
     const catFromUrl = searchParams.get('category');
     if (catFromUrl) {
       setCategory(catFromUrl);
-<<<<<<< HEAD
-    } else {
-      setCategory('All');
-    }
-  }, [searchParams]);
-
-  const fetchSchemes = async () => {
-    setLoading(true);
-    try {
-      const res = await schemeService.getSchemes({
-        page,
-        limit: 9,
-        search: search || undefined,
-        category: category !== 'All' ? category : undefined,
-        state: stateFilter !== 'All' ? stateFilter : undefined,
-        occupation: occupation !== 'All' ? occupation : undefined
-      });
-
-      if (res.success) {
-        setSchemes(res.schemes);
-        setTotalPages(res.pages);
-        setTotalSchemes(res.total);
-=======
     }
   }, [searchParams]);
 
@@ -90,20 +48,12 @@ export const SchemesPage = () => {
         setSchemes(res.schemes || []);
         setTotalPages(res.pages || 1);
         setTotalSchemes(res.total || 0);
->>>>>>> second-copy
       }
     } catch (error) {
       console.error('Failed to load schemes catalog:', error);
     } finally {
       setLoading(false);
     }
-<<<<<<< HEAD
-  };
-
-  useEffect(() => {
-    fetchSchemes();
-  }, [page, category, stateFilter, occupation]);
-=======
   }, [page, search, category, stateFilter, sortBy]);
 
   // Debounce search changes
@@ -113,27 +63,18 @@ export const SchemesPage = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [page, search, category, stateFilter, sortBy, fetchSchemes]);
->>>>>>> second-copy
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setPage(1);
-<<<<<<< HEAD
-    fetchSchemes();
-=======
     fetchSchemes(1, search);
->>>>>>> second-copy
   };
 
   const handleResetFilters = () => {
     setSearch('');
     setCategory('All');
     setStateFilter('All');
-<<<<<<< HEAD
-    setOccupation('All');
-=======
     setSortBy('newest');
->>>>>>> second-copy
     setPage(1);
     setSearchParams({});
   };
@@ -150,25 +91,6 @@ export const SchemesPage = () => {
         </p>
       </div>
 
-<<<<<<< HEAD
-      {/* Filter Control Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-        <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 md:grid-cols-12 gap-3">
-          {/* Keyword Search */}
-          <div className="md:col-span-4 relative">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search scheme name, benefit or ministry..."
-              className="w-full pl-9 pr-3 py-2.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#0f2942] outline-none"
-            />
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-          </div>
-
-          {/* Category Filter */}
-          <div className="md:col-span-3">
-=======
       {/* Filter & Sorting Control Bar */}
       <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
         <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3">
@@ -201,7 +123,6 @@ export const SchemesPage = () => {
 
           {/* Category Filter */}
           <div className="lg:col-span-3">
->>>>>>> second-copy
             <select
               value={category}
               onChange={(e) => {
@@ -226,28 +147,17 @@ export const SchemesPage = () => {
           </div>
 
           {/* State Filter */}
-<<<<<<< HEAD
-          <div className="md:col-span-3">
-=======
           <div className="lg:col-span-2">
->>>>>>> second-copy
             <select
               value={stateFilter}
               onChange={(e) => {
                 setStateFilter(e.target.value);
                 setPage(1);
               }}
-<<<<<<< HEAD
-              className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#0f2942] outline-none"
-            >
-              <option value="All">State: All India</option>
-              {INDIAN_STATES.map((s) => (
-=======
               className="w-full px-3 py-2.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-[#0f2942] outline-none cursor-pointer"
             >
               <option value="All">State: All India</option>
               {INDIAN_STATES.filter((s) => s !== 'All').map((s) => (
->>>>>>> second-copy
                 <option key={s} value={s}>
                   {s}
                 </option>
@@ -255,21 +165,6 @@ export const SchemesPage = () => {
             </select>
           </div>
 
-<<<<<<< HEAD
-          {/* Action Buttons */}
-          <div className="md:col-span-2 flex items-center gap-2">
-            <button
-              type="submit"
-              className="flex-1 py-2.5 bg-[#0f2942] hover:bg-[#0c2338] text-white text-xs font-bold rounded-xl shadow-xs cursor-pointer transition-colors"
-            >
-              Search
-            </button>
-            <button
-              type="button"
-              onClick={handleResetFilters}
-              className="p-2.5 border border-slate-200 hover:bg-slate-100 rounded-xl text-slate-600 cursor-pointer"
-              title="Reset Filters"
-=======
           {/* Sorting Dropdown */}
           <div className="lg:col-span-2">
             <select
@@ -297,7 +192,6 @@ export const SchemesPage = () => {
               onClick={handleResetFilters}
               className="w-full p-2.5 border border-slate-200 hover:bg-slate-100 rounded-xl text-slate-600 cursor-pointer flex items-center justify-center transition-colors"
               title="Reset All Filters"
->>>>>>> second-copy
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -305,15 +199,6 @@ export const SchemesPage = () => {
         </form>
 
         {/* Results Metadata */}
-<<<<<<< HEAD
-        <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-          <span>Showing <strong className="text-slate-900">{schemes.length}</strong> of <strong className="text-slate-900">{totalSchemes}</strong> Schemes</span>
-          {category !== 'All' && (
-            <span className="bg-blue-50 text-[#0f2942] px-2.5 py-0.5 rounded-full font-semibold">
-              Filter: {category}
-            </span>
-          )}
-=======
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 pt-2 border-t border-slate-100">
           <span>
             Showing <strong className="text-slate-900">{schemes.length}</strong> of{' '}
@@ -336,7 +221,6 @@ export const SchemesPage = () => {
               </span>
             )}
           </div>
->>>>>>> second-copy
         </div>
       </div>
 
@@ -348,17 +232,6 @@ export const SchemesPage = () => {
           ))}
         </div>
       ) : schemes.length === 0 ? (
-<<<<<<< HEAD
-        <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-3">
-          <Filter className="w-10 h-10 text-slate-300 mx-auto" />
-          <h3 className="text-base font-bold text-slate-900">No schemes found matching your criteria</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Try adjusting your search terms or clearing the selected category filters.
-          </p>
-          <button
-            onClick={handleResetFilters}
-            className="px-4 py-2 bg-[#0f2942] text-white text-xs font-bold rounded-xl mt-2 cursor-pointer"
-=======
         <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-3 shadow-xs">
           <Filter className="w-10 h-10 text-slate-300 mx-auto" />
           <h3 className="text-base font-bold text-slate-900">No matching schemes found</h3>
@@ -369,7 +242,6 @@ export const SchemesPage = () => {
             type="button"
             onClick={handleResetFilters}
             className="px-5 py-2.5 bg-[#0f2942] hover:bg-[#0c2338] text-white text-xs font-bold rounded-xl mt-2 cursor-pointer transition-all shadow-sm"
->>>>>>> second-copy
           >
             Clear All Filters
           </button>

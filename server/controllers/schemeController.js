@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-import Scheme from '../models/Scheme.js';
-=======
 import mongoose from 'mongoose';
 import Scheme from '../models/Scheme.js';
 import User from '../models/User.js';
@@ -219,7 +216,6 @@ const cleanStringArray = (val) => {
   }
   return [];
 };
->>>>>>> second-copy
 
 // @desc    Get all active government schemes with search, category, state filters & pagination
 // @route   GET /api/schemes
@@ -230,62 +226,6 @@ export const getSchemes = async (req, res, next) => {
     const limit = parseInt(req.query.limit, 10) || 50;
     const skip = (page - 1) * limit;
 
-<<<<<<< HEAD
-    const { search, category, state, occupation, status } = req.query;
-
-    const query = {};
-
-    // Status filter handling for public and admin API requests
-    if (status) {
-      if (status === 'all') {
-        // Admin requesting all schemes (no status restriction)
-      } else if (status.toLowerCase() === 'active') {
-        query.status = 'Active';
-      } else if (status.toLowerCase() === 'inactive') {
-        query.status = 'Inactive';
-      } else {
-        query.status = status;
-      }
-    } else {
-      query.status = 'Active';
-    }
-
-    // Category filter
-    if (category && category !== 'All') {
-      // Regex search for flexible category matching (e.g., 'Agriculture' matches 'Agriculture & Farmers')
-      const catRegex = new RegExp(category.replace(/[^a-zA-Z0-9]/g, '.*'), 'i');
-      query.category = catRegex;
-    }
-
-    // State filter
-    if (state && state !== 'All') {
-      query.$or = [
-        { state: new RegExp(state, 'i') },
-        { state: 'All India' },
-        { state: 'Central' }
-      ];
-    }
-
-    // Occupation filter inside eligibility criteria
-    if (occupation && occupation !== 'All') {
-      query.$or = [
-        { 'eligibilityCriteria.allowedOccupations': 'All' },
-        { 'eligibilityCriteria.allowedOccupations': new RegExp(occupation, 'i') }
-      ];
-    }
-
-    // Search query filter across title, description, department, category
-    if (search && search.trim()) {
-      const s = search.trim();
-      const regex = new RegExp(s, 'i');
-      query.$or = [
-        { title: regex },
-        { description: regex },
-        { shortDescription: regex },
-        { department: regex },
-        { category: regex }
-      ];
-=======
     const {
       search,
       category,
@@ -459,17 +399,12 @@ export const getSchemes = async (req, res, next) => {
     } else {
       // Default: Newest first
       sortConfig.createdAt = -1;
->>>>>>> second-copy
     }
 
     const total = await Scheme.countDocuments(query);
     const schemes = await Scheme.find(query)
-<<<<<<< HEAD
-      .sort({ createdAt: -1 })
-=======
       .collation({ locale: 'en', strength: 2 })
       .sort(sortConfig)
->>>>>>> second-copy
       .skip(skip)
       .limit(limit);
 
@@ -491,10 +426,6 @@ export const getSchemes = async (req, res, next) => {
 // @access  Public
 export const getSchemeById = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    const scheme = await Scheme.findByIdAndUpdate(
-      req.params.id,
-=======
     const { id } = req.params;
 
     // If 'all' or 'All' is requested, delegate to getSchemes
@@ -511,7 +442,6 @@ export const getSchemeById = async (req, res, next) => {
 
     const scheme = await Scheme.findByIdAndUpdate(
       id,
->>>>>>> second-copy
       { $inc: { viewCount: 1 } },
       { new: true }
     );
@@ -523,8 +453,6 @@ export const getSchemeById = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-=======
     // Hide Inactive schemes from regular users/guests
     if (scheme.status === 'Inactive') {
       const isAdmin = req.user && req.user.role === 'admin';
@@ -536,7 +464,6 @@ export const getSchemeById = async (req, res, next) => {
       }
     }
 
->>>>>>> second-copy
     return res.status(200).json({
       success: true,
       scheme
@@ -546,31 +473,11 @@ export const getSchemeById = async (req, res, next) => {
   }
 };
 
-<<<<<<< HEAD
-// @desc    Create a new scheme
-=======
 // @desc    Create a new scheme with strict validation
->>>>>>> second-copy
 // @route   POST /api/schemes
 // @access  Private / Admin
 export const createScheme = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    const { title, description, department, category } = req.body;
-
-    if (!title || !description || !department || !category) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide required scheme fields: title, description, department, and category.'
-      });
-    }
-
-    const scheme = await Scheme.create(req.body);
-
-    return res.status(201).json({
-      success: true,
-      message: 'Scheme created successfully',
-=======
     const {
       title,
       code,
@@ -739,7 +646,6 @@ export const createScheme = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: 'Scheme published successfully.',
->>>>>>> second-copy
       scheme
     });
   } catch (error) {
@@ -747,18 +653,11 @@ export const createScheme = async (req, res, next) => {
   }
 };
 
-<<<<<<< HEAD
-// @desc    Update scheme details
-=======
 // @desc    Update scheme details with strict validation
->>>>>>> second-copy
 // @route   PUT /api/schemes/:id
 // @access  Private / Admin
 export const updateScheme = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    const scheme = await Scheme.findByIdAndUpdate(req.params.id, req.body, {
-=======
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -944,7 +843,6 @@ export const updateScheme = async (req, res, next) => {
     }
 
     const scheme = await Scheme.findByIdAndUpdate(id, { $set: updateBody }, {
->>>>>>> second-copy
       new: true,
       runValidators: true
     });
@@ -956,11 +854,6 @@ export const updateScheme = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-    return res.status(200).json({
-      success: true,
-      message: 'Scheme updated successfully',
-=======
     const adminName = req.user?.name || req.user?.email || 'Admin';
     await logActivity({
       action: 'EDIT SCHEME',
@@ -971,7 +864,6 @@ export const updateScheme = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: 'Scheme updated successfully.',
->>>>>>> second-copy
       scheme
     });
   } catch (error) {
@@ -984,9 +876,6 @@ export const updateScheme = async (req, res, next) => {
 // @access  Private / Admin
 export const deleteScheme = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    const scheme = await Scheme.findByIdAndDelete(req.params.id);
-=======
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -997,7 +886,6 @@ export const deleteScheme = async (req, res, next) => {
     }
 
     const scheme = await Scheme.findByIdAndDelete(id);
->>>>>>> second-copy
 
     if (!scheme) {
       return res.status(404).json({
@@ -1006,11 +894,6 @@ export const deleteScheme = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-    return res.status(200).json({
-      success: true,
-      message: 'Scheme deleted successfully'
-=======
     // Clean up references to this deleted scheme from all users' saved lists in MongoDB
     await User.updateMany(
       {},
@@ -1027,7 +910,6 @@ export const deleteScheme = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: `Scheme "${scheme.title}" deleted permanently from the database.`
->>>>>>> second-copy
     });
   } catch (error) {
     next(error);
@@ -1039,9 +921,6 @@ export const deleteScheme = async (req, res, next) => {
 // @access  Private / Admin
 export const toggleSchemeStatus = async (req, res, next) => {
   try {
-<<<<<<< HEAD
-    const scheme = await Scheme.findById(req.params.id);
-=======
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -1052,7 +931,6 @@ export const toggleSchemeStatus = async (req, res, next) => {
     }
 
     const scheme = await Scheme.findById(id);
->>>>>>> second-copy
 
     if (!scheme) {
       return res.status(404).json({
@@ -1061,14 +939,6 @@ export const toggleSchemeStatus = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-    scheme.status = scheme.status === 'Active' ? 'Inactive' : 'Active';
-    await scheme.save();
-
-    return res.status(200).json({
-      success: true,
-      message: `Scheme status updated to ${scheme.status}`,
-=======
     const previousStatus = scheme.status || (scheme.isActive ? 'Active' : 'Inactive');
     const newStatus = previousStatus === 'Active' ? 'Inactive' : 'Active';
 
@@ -1086,7 +956,6 @@ export const toggleSchemeStatus = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: `Scheme status updated to ${newStatus}`,
->>>>>>> second-copy
       scheme
     });
   } catch (error) {

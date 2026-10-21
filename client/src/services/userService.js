@@ -15,10 +15,6 @@ export const userService = {
         'Content-Type': 'multipart/form-data'
       }
     });
-<<<<<<< HEAD
-  }
-};
-=======
   },
 
   removeAvatar: async () => {
@@ -38,4 +34,3 @@ export const userService = {
   }
 };
 
->>>>>>> second-copy

@@ -1,19 +1,10 @@
-<<<<<<< HEAD
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-=======
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
->>>>>>> second-copy
 import { useAuth } from '../context/AuthContext';
 import { userService } from '../services/userService';
 import { useNotification } from '../context/NotificationContext';
 import {
   User,
-<<<<<<< HEAD
-  Upload,
-=======
->>>>>>> second-copy
   Save,
   ShieldCheck,
   MapPin,
@@ -22,16 +13,6 @@ import {
   IndianRupee,
   Phone,
   Mail,
-<<<<<<< HEAD
-  Camera,
-  CheckCircle2,
-  ArrowRight,
-  Loader2,
-  Sparkles
-} from 'lucide-react';
-import {
-  INDIAN_STATES,
-=======
   ArrowRight,
   Loader2,
   CheckCircle2,
@@ -42,7 +23,6 @@ import {
   INDIAN_STATES,
   STATE_CITIES,
   getCitiesByState,
->>>>>>> second-copy
   OCCUPATIONS,
   EDUCATION_LEVELS,
   CASTE_CATEGORIES,
@@ -58,15 +38,6 @@ export const ProfilePage = () => {
     name: '',
     mobileNumber: '',
     age: '',
-<<<<<<< HEAD
-    gender: 'Male',
-    state: 'Delhi',
-    district: '',
-    occupation: 'Other',
-    education: 'Graduate',
-    annualIncome: '',
-    caste: 'General',
-=======
     gender: '',
     state: '',
     city: '',
@@ -74,37 +45,10 @@ export const ProfilePage = () => {
     education: '',
     annualIncome: '',
     caste: '',
->>>>>>> second-copy
     disabilityStatus: false,
     bplStatus: false
   });
 
-<<<<<<< HEAD
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isEvaluating, setIsEvaluating] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        mobileNumber: user.mobileNumber || '',
-        age: user.age !== null && user.age !== undefined ? user.age : '',
-        gender: user.gender || 'Male',
-        state: user.state || 'Delhi',
-        district: user.district || '',
-        occupation: user.occupation || 'Other',
-        education: user.education || 'Graduate',
-        annualIncome: user.annualIncome !== null && user.annualIncome !== undefined ? user.annualIncome : '',
-        caste: user.caste || 'General',
-        disabilityStatus: Boolean(user.disabilityStatus),
-        bplStatus: Boolean(user.bplStatus)
-      });
-      setAvatarPreview(user.avatar || '');
-    }
-  }, [user]);
-=======
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
@@ -285,7 +229,6 @@ export const ProfilePage = () => {
 
     return newErrors;
   };
->>>>>>> second-copy
 
   // Calculate Profile Completion %
   const calculateCompletion = () => {
@@ -295,11 +238,7 @@ export const ProfilePage = () => {
       formData.age,
       formData.gender,
       formData.state,
-<<<<<<< HEAD
-      formData.district,
-=======
       formData.city,
->>>>>>> second-copy
       formData.occupation,
       formData.education,
       formData.annualIncome,
@@ -309,37 +248,6 @@ export const ProfilePage = () => {
     return Math.round((filled / fields.length) * 100);
   };
 
-<<<<<<< HEAD
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setAvatarFile(file);
-      setAvatarPreview(URL.createObjectURL(file));
-      handleUploadAvatar(file);
-    }
-  };
-
-  const handleUploadAvatar = async (file) => {
-    try {
-      const data = new FormData();
-      data.append('avatar', file);
-      const res = await userService.uploadAvatar(data);
-      if (res.success) {
-        notifySuccess('Profile photo updated successfully!');
-        if (res.user) updateUserState(res.user);
-      }
-    } catch (error) {
-      notifyError(error.message || 'Avatar upload failed');
-    }
-=======
   // Dependent Cities list based on selected State
   const availableCities = useMemo(() => {
     return formData.state ? getCitiesByState(formData.state) : [];
@@ -404,47 +312,10 @@ export const ProfilePage = () => {
       }
       return next;
     });
->>>>>>> second-copy
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-<<<<<<< HEAD
-    if (loading || isEvaluating) return;
-
-    if (!formData.name.trim()) {
-      notifyError('Please enter your full name.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // 1. Save profile to backend
-      const res = await userService.updateProfile(formData);
-      if (res.success && res.user) {
-        updateUserState(res.user);
-
-        // 2. Automatically run background eligibility evaluation
-        await runBackgroundEligibilityCheck(res.user);
-
-        // 3. Show Green Success Toast: "Eligibility Evaluated Successfully"
-        notifySuccess('Eligibility Evaluated Successfully');
-
-        // 4. After 1.5s (as toast disappears), open loading modal and redirect
-        setTimeout(() => {
-          setIsEvaluating(true);
-        }, 1200);
-
-        // 5. Automatically redirect to Dashboard after modal informs user
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 2800);
-      }
-    } catch (error) {
-      notifyError(error.response?.data?.message || error.message || 'Failed to update profile');
-      setIsEvaluating(false);
-    } finally {
-=======
     if (loading || isFindingSchemes) return; // Prevent duplicate requests
 
     // 1. Run full form validation
@@ -557,19 +428,12 @@ export const ProfilePage = () => {
         setErrors(error.response.data.errors);
       }
       setIsFindingSchemes(false);
->>>>>>> second-copy
       setLoading(false);
     }
   };
 
   const completionPct = calculateCompletion();
 
-<<<<<<< HEAD
-  return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 relative">
-      {/* PREMIUM FULL-SCREEN REDIRECT LOADING OVERLAY */}
-      {isEvaluating && (
-=======
   if (initialLoading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 flex flex-col items-center justify-center space-y-4">
@@ -592,7 +456,6 @@ export const ProfilePage = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8 relative">
       {/* PREMIUM FULL-SCREEN FINDING SCHEMES TRANSITION SCREEN */}
       {isFindingSchemes && (
->>>>>>> second-copy
         <div className="fixed inset-0 z-[10000] bg-slate-950/80 backdrop-blur-lg flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-8 sm:p-10 max-w-md w-full text-center space-y-6 shadow-2xl border border-slate-200 animate-card-enter">
             {/* Glowing Tricolor Pulse Ring */}
@@ -605,17 +468,10 @@ export const ProfilePage = () => {
 
             <div className="space-y-2">
               <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
-<<<<<<< HEAD
-                Redirecting to Dashboard...
-              </h3>
-              <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                Evaluating your profile criteria against government welfare schemes...
-=======
                 Finding Your Eligible Schemes...
               </h3>
               <p className="text-xs text-slate-500 leading-relaxed font-medium">
                 Please wait while we find schemes based on your profile.
->>>>>>> second-copy
               </p>
             </div>
 
@@ -629,35 +485,6 @@ export const ProfilePage = () => {
       {/* Header Banner */}
       <div className="surface-card p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-5">
-<<<<<<< HEAD
-          {/* Avatar Container */}
-          <div className="relative group shrink-0">
-            {avatarPreview ? (
-              <img
-                src={avatarPreview}
-                alt="Profile"
-                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-[#0f2942] text-[#e07a10] font-extrabold text-3xl flex items-center justify-center border-4 border-white shadow-md">
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-              </div>
-            )}
-
-            <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#e07a10] hover:bg-[#c96a0b] text-white flex items-center justify-center cursor-pointer shadow-md transition-transform group-hover:scale-105">
-              <Camera className="w-4 h-4" />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarChange}
-                className="hidden"
-              />
-            </label>
-          </div>
-
-          <div className="space-y-1 text-center sm:text-left">
-            <h1 className="text-2xl font-extrabold text-slate-900">{user?.name}</h1>
-=======
           {/* Avatar Container - 1st Letter of Name */}
           <div className="shrink-0">
             <div className="w-24 h-24 rounded-full bg-[#0f2942] text-[#e07a10] font-black text-4xl flex items-center justify-center border-4 border-white shadow-lg ring-4 ring-slate-100/80 select-none">
@@ -667,17 +494,12 @@ export const ProfilePage = () => {
 
           <div className="space-y-1 text-center sm:text-left">
             <h1 className="text-2xl font-extrabold text-slate-900">{formData.name || user?.name}</h1>
->>>>>>> second-copy
             <p className="text-xs text-slate-500 flex items-center justify-center sm:justify-start gap-1 font-medium">
               <Mail className="w-3.5 h-3.5" />
               {user?.email}
             </p>
             <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-blue-900 border border-blue-200">
-<<<<<<< HEAD
-              Role: {user?.role}
-=======
               Role: {user?.role || 'Citizen'}
->>>>>>> second-copy
             </span>
           </div>
         </div>
@@ -698,22 +520,14 @@ export const ProfilePage = () => {
             to="/dashboard"
             className="w-full py-2 bg-[#0f2942] hover:bg-[#0c2338] text-white text-xs font-extrabold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer block text-center mt-2"
           >
-<<<<<<< HEAD
-            <span>Proceed to Dashboard</span>
-=======
             <span>View Eligible Schemes</span>
->>>>>>> second-copy
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>
 
       {/* Main Profile Form */}
-<<<<<<< HEAD
-      <form onSubmit={handleSubmit} className="surface-card p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-md space-y-8">
-=======
       <form onSubmit={handleSubmit} noValidate className="surface-card p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-md space-y-8">
->>>>>>> second-copy
         {/* Section 1: Contact Information */}
         <div className="space-y-4">
           <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 border-b pb-2">
@@ -722,10 +536,7 @@ export const ProfilePage = () => {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-<<<<<<< HEAD
-=======
             {/* Full Name */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Full Name *
@@ -735,14 +546,6 @@ export const ProfilePage = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-<<<<<<< HEAD
-                required
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              />
-            </div>
-
-=======
                 onBlur={handleBlur}
                 maxLength={100}
                 placeholder="e.g. Rahul Sharma"
@@ -758,22 +561,12 @@ export const ProfilePage = () => {
             </div>
 
             {/* Mobile Number */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Mobile Number *
               </label>
               <input
                 type="text"
-<<<<<<< HEAD
-                name="mobileNumber"
-                value={formData.mobileNumber}
-                onChange={handleChange}
-                placeholder="10 digit mobile number"
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              />
-=======
                 inputMode="numeric"
                 name="mobileNumber"
                 value={formData.mobileNumber}
@@ -790,7 +583,6 @@ export const ProfilePage = () => {
                   <span>{errors.mobileNumber}</span>
                 </p>
               )}
->>>>>>> second-copy
             </div>
           </div>
         </div>
@@ -803,27 +595,12 @@ export const ProfilePage = () => {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-<<<<<<< HEAD
-=======
             {/* Age (Years) */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Age (Years) *
               </label>
               <input
-<<<<<<< HEAD
-                type="number"
-                name="age"
-                value={formData.age}
-                onChange={handleChange}
-                required
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              />
-            </div>
-
-=======
                 type="text"
                 inputMode="numeric"
                 name="age"
@@ -844,7 +621,6 @@ export const ProfilePage = () => {
             </div>
 
             {/* Gender */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Gender *
@@ -853,27 +629,17 @@ export const ProfilePage = () => {
                 name="gender"
                 value={formData.gender}
                 onChange={handleChange}
-<<<<<<< HEAD
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              >
-=======
                 onBlur={handleBlur}
                 disabled={loading || isFindingSchemes}
                 className={`${getFieldClass('gender')} cursor-pointer`}
               >
                 <option value="">Select Gender</option>
->>>>>>> second-copy
                 {GENDERS.map((g) => (
                   <option key={g} value={g}>
                     {g}
                   </option>
                 ))}
               </select>
-<<<<<<< HEAD
-            </div>
-
-=======
               {errors.gender && touched.gender && (
                 <p className="mt-1 text-xs text-red-600 font-semibold flex items-center gap-1 animate-fade-in" id="gender-error">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -883,23 +649,11 @@ export const ProfilePage = () => {
             </div>
 
             {/* Annual Income */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Annual Income (₹) *
               </label>
               <input
-<<<<<<< HEAD
-                type="number"
-                name="annualIncome"
-                value={formData.annualIncome}
-                onChange={handleChange}
-                placeholder="e.g. 180000"
-                required
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              />
-=======
                 type="text"
                 inputMode="numeric"
                 name="annualIncome"
@@ -917,15 +671,11 @@ export const ProfilePage = () => {
                   <span>{errors.annualIncome}</span>
                 </p>
               )}
->>>>>>> second-copy
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-<<<<<<< HEAD
-=======
             {/* State of Residence */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 State of Residence *
@@ -934,40 +684,17 @@ export const ProfilePage = () => {
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-<<<<<<< HEAD
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              >
-=======
                 onBlur={handleBlur}
                 disabled={loading || isFindingSchemes}
                 className={`${getFieldClass('state')} cursor-pointer`}
               >
                 <option value="">Select State</option>
->>>>>>> second-copy
                 {INDIAN_STATES.filter((s) => s !== 'All').map((st) => (
                   <option key={st} value={st}>
                     {st}
                   </option>
                 ))}
               </select>
-<<<<<<< HEAD
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                District
-              </label>
-              <input
-                type="text"
-                name="district"
-                value={formData.district}
-                onChange={handleChange}
-                placeholder="District name"
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              />
-=======
               {errors.state && touched.state && (
                 <p className="mt-1 text-xs text-red-600 font-semibold flex items-center gap-1 animate-fade-in" id="state-error">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -1007,15 +734,11 @@ export const ProfilePage = () => {
                   <span>{errors.city}</span>
                 </p>
               )}
->>>>>>> second-copy
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-<<<<<<< HEAD
-=======
             {/* Occupation */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Occupation *
@@ -1024,27 +747,17 @@ export const ProfilePage = () => {
                 name="occupation"
                 value={formData.occupation}
                 onChange={handleChange}
-<<<<<<< HEAD
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              >
-=======
                 onBlur={handleBlur}
                 disabled={loading || isFindingSchemes}
                 className={`${getFieldClass('occupation')} cursor-pointer`}
               >
                 <option value="">Select Occupation</option>
->>>>>>> second-copy
                 {OCCUPATIONS.filter((o) => o !== 'All').map((occ) => (
                   <option key={occ} value={occ}>
                     {occ}
                   </option>
                 ))}
               </select>
-<<<<<<< HEAD
-            </div>
-
-=======
               {errors.occupation && touched.occupation && (
                 <p className="mt-1 text-xs text-red-600 font-semibold flex items-center gap-1 animate-fade-in" id="occupation-error">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -1054,7 +767,6 @@ export const ProfilePage = () => {
             </div>
 
             {/* Education Level */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Education Level *
@@ -1063,27 +775,17 @@ export const ProfilePage = () => {
                 name="education"
                 value={formData.education}
                 onChange={handleChange}
-<<<<<<< HEAD
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              >
-=======
                 onBlur={handleBlur}
                 disabled={loading || isFindingSchemes}
                 className={`${getFieldClass('education')} cursor-pointer`}
               >
                 <option value="">Select Education Level</option>
->>>>>>> second-copy
                 {EDUCATION_LEVELS.filter((e) => e !== 'All').map((edu) => (
                   <option key={edu} value={edu}>
                     {edu}
                   </option>
                 ))}
               </select>
-<<<<<<< HEAD
-            </div>
-
-=======
               {errors.education && touched.education && (
                 <p className="mt-1 text-xs text-red-600 font-semibold flex items-center gap-1 animate-fade-in" id="education-error">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
@@ -1093,7 +795,6 @@ export const ProfilePage = () => {
             </div>
 
             {/* Social Category / Caste */}
->>>>>>> second-copy
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Social Category / Caste *
@@ -1102,32 +803,23 @@ export const ProfilePage = () => {
                 name="caste"
                 value={formData.caste}
                 onChange={handleChange}
-<<<<<<< HEAD
-                disabled={loading || isEvaluating}
-                className="w-full px-3.5 py-2.5 border rounded-xl text-sm bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-60"
-              >
-=======
                 onBlur={handleBlur}
                 disabled={loading || isFindingSchemes}
                 className={`${getFieldClass('caste')} cursor-pointer`}
               >
                 <option value="">Select Social Category</option>
->>>>>>> second-copy
                 {CASTE_CATEGORIES.filter((c) => c !== 'All').map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
               </select>
-<<<<<<< HEAD
-=======
               {errors.caste && touched.caste && (
                 <p className="mt-1 text-xs text-red-600 font-semibold flex items-center gap-1 animate-fade-in" id="caste-error">
                   <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                   <span>{errors.caste}</span>
                 </p>
               )}
->>>>>>> second-copy
             </div>
           </div>
 
@@ -1139,11 +831,7 @@ export const ProfilePage = () => {
                 name="disabilityStatus"
                 checked={formData.disabilityStatus}
                 onChange={handleChange}
-<<<<<<< HEAD
-                disabled={loading || isEvaluating}
-=======
                 disabled={loading || isFindingSchemes}
->>>>>>> second-copy
                 className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
               <label htmlFor="disabilityProfile" className="text-xs font-semibold text-slate-800 cursor-pointer">
@@ -1158,11 +846,7 @@ export const ProfilePage = () => {
                 name="bplStatus"
                 checked={formData.bplStatus}
                 onChange={handleChange}
-<<<<<<< HEAD
-                disabled={loading || isEvaluating}
-=======
                 disabled={loading || isFindingSchemes}
->>>>>>> second-copy
                 className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
               <label htmlFor="bplProfile" className="text-xs font-semibold text-slate-800 cursor-pointer">
@@ -1172,16 +856,6 @@ export const ProfilePage = () => {
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Submit */}
-        <div className="flex justify-end pt-4 border-t border-slate-100">
-          <button
-            type="submit"
-            disabled={loading || isEvaluating}
-            className="px-8 py-3.5 bg-[#e07a10] hover:bg-[#c96a0b] text-white font-extrabold text-sm rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            {loading || isEvaluating ? (
-=======
         {/* Submit Button */}
         <div className="flex justify-end pt-4 border-t border-slate-100">
           <button
@@ -1190,7 +864,6 @@ export const ProfilePage = () => {
             className="px-8 py-3.5 bg-[#e07a10] hover:bg-[#c96a0b] text-white font-extrabold text-sm rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {loading || isFindingSchemes ? (
->>>>>>> second-copy
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span>Saving Profile...</span>
@@ -1207,8 +880,5 @@ export const ProfilePage = () => {
     </div>
   );
 };
-<<<<<<< HEAD
-=======
 
 export default ProfilePage;
->>>>>>> second-copy

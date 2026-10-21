@@ -9,12 +9,6 @@ export const authService = {
     return await api.post('/auth/register', userData);
   },
 
-<<<<<<< HEAD
-  getMe: async () => {
-    return await api.get('/auth/me');
-  }
-};
-=======
   logout: async () => {
     return await api.post('/auth/logout');
   },
@@ -53,4 +47,3 @@ export const authService = {
 };
 
 export default authService;
->>>>>>> second-copy

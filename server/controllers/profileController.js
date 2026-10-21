@@ -1,6 +1,4 @@
 import User from '../models/User.js';
-<<<<<<< HEAD
-=======
 import Scheme from '../models/Scheme.js';
 import { logActivity } from '../utils/activityLogger.js';
 
@@ -17,7 +15,6 @@ const hasProfileData = (user) => {
     user.mobileNumber
   );
 };
->>>>>>> second-copy
 
 // @desc    Get logged in user profile
 // @route   GET /api/profile
@@ -55,13 +52,6 @@ export const updateProfile = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-    const {
-      name,
-      age,
-      gender,
-      state,
-=======
     const isFirstSave = !hasProfileData(user);
 
     const {
@@ -71,7 +61,6 @@ export const updateProfile = async (req, res, next) => {
       gender,
       state,
       city,
->>>>>>> second-copy
       occupation,
       education,
       annualIncome,
@@ -80,16 +69,6 @@ export const updateProfile = async (req, res, next) => {
       bplStatus
     } = req.body;
 
-<<<<<<< HEAD
-    if (name !== undefined) user.name = name.trim();
-    if (age !== undefined) user.age = Number(age);
-    if (gender !== undefined) user.gender = gender;
-    if (state !== undefined) user.state = state.trim();
-    if (occupation !== undefined) user.occupation = occupation.trim();
-    if (education !== undefined) user.education = education.trim();
-    if (annualIncome !== undefined) user.annualIncome = Number(annualIncome);
-    if (caste !== undefined) user.caste = caste.trim();
-=======
     const validationErrors = {};
 
     // 1. Full Name Validation
@@ -241,21 +220,17 @@ export const updateProfile = async (req, res, next) => {
     user.occupation = cleanOccupation;
     user.education = cleanEducation;
     user.caste = cleanCaste;
->>>>>>> second-copy
     if (disabilityStatus !== undefined) user.disabilityStatus = Boolean(disabilityStatus);
     if (bplStatus !== undefined) user.bplStatus = Boolean(bplStatus);
 
     const updatedUser = await user.save();
 
-<<<<<<< HEAD
-=======
     await logActivity({
       action: isFirstSave ? 'Profile Created' : 'Profile Updated',
       user: updatedUser,
       details: `${updatedUser.name} (${updatedUser.email}) ${isFirstSave ? 'created their demographic profile' : 'updated their demographic profile'}.`
     });
 
->>>>>>> second-copy
     return res.status(200).json({
       success: true,
       message: 'Profile updated successfully',
@@ -280,9 +255,6 @@ export const uploadAvatar = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: 'Avatar uploaded successfully',
-<<<<<<< HEAD
-      avatar: avatarUrl
-=======
       avatar: avatarUrl,
       user: user ? user.toJSON() : undefined
     });
@@ -467,7 +439,6 @@ export const removeSavedScheme = async (req, res, next) => {
       isSaved: false,
       savedSchemes: user.savedSchemes,
       user: user.toJSON()
->>>>>>> second-copy
     });
   } catch (error) {
     next(error);

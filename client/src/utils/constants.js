@@ -1,36 +1,23 @@
 export const INDIAN_STATES = [
-<<<<<<< HEAD
-=======
   'Andaman and Nicobar Islands',
->>>>>>> second-copy
   'Andhra Pradesh',
   'Arunachal Pradesh',
   'Assam',
   'Bihar',
-<<<<<<< HEAD
-  'Chhattisgarh',
-=======
   'Chandigarh',
   'Chhattisgarh',
   'Dadra and Nagar Haveli and Daman and Diu',
   'Delhi',
->>>>>>> second-copy
   'Goa',
   'Gujarat',
   'Haryana',
   'Himachal Pradesh',
-<<<<<<< HEAD
-  'Jharkhand',
-  'Karnataka',
-  'Kerala',
-=======
   'Jammu and Kashmir',
   'Jharkhand',
   'Karnataka',
   'Kerala',
   'Ladakh',
   'Lakshadweep',
->>>>>>> second-copy
   'Madhya Pradesh',
   'Maharashtra',
   'Manipur',
@@ -38,10 +25,7 @@ export const INDIAN_STATES = [
   'Mizoram',
   'Nagaland',
   'Odisha',
-<<<<<<< HEAD
-=======
   'Puducherry',
->>>>>>> second-copy
   'Punjab',
   'Rajasthan',
   'Sikkim',
@@ -50,33 +34,11 @@ export const INDIAN_STATES = [
   'Tripura',
   'Uttar Pradesh',
   'Uttarakhand',
-<<<<<<< HEAD
-  'West Bengal',
-  'Andaman and Nicobar Islands',
-  'Chandigarh',
-  'Dadra and Nagar Haveli and Daman and Diu',
-  'Delhi',
-  'Jammu and Kashmir',
-  'Ladakh',
-  'Lakshadweep',
-  'Puducherry'
-=======
   'West Bengal'
->>>>>>> second-copy
 ];
 
 export const SCHEME_CATEGORIES = [
   'Agriculture & Farmers',
-<<<<<<< HEAD
-  'Healthcare & Health Insurance',
-  'Education & Scholarships',
-  'Financial Inclusion & Business',
-  'Housing & Rural Development',
-  'Women & Child Welfare',
-  'Social Security & Pensions',
-  'Employment & Skill Development',
-  'General Welfare'
-=======
   'Education & Scholarships',
   'Employment & Skill Development',
   'Financial Inclusion & Business',
@@ -85,24 +47,15 @@ export const SCHEME_CATEGORIES = [
   'Housing & Rural Development',
   'Social Security & Pensions',
   'Women & Child Welfare'
->>>>>>> second-copy
 ];
 
 export const OCCUPATIONS = [
   'Farmer',
-<<<<<<< HEAD
-  'Student',
-  'Self-Employed',
-  'Unemployed',
-  'Salaried',
-  'Other'
-=======
   'Other',
   'Salaried',
   'Self-Employed',
   'Student',
   'Unemployed'
->>>>>>> second-copy
 ];
 
 export const EDUCATION_LEVELS = [
@@ -114,20 +67,6 @@ export const EDUCATION_LEVELS = [
 ];
 
 export const CASTE_CATEGORIES = [
-<<<<<<< HEAD
-  'General',
-  'OBC',
-  'SC',
-  'ST',
-  'EWS'
-];
-
-export const GENDERS = [
-  'Male',
-  'Female',
-  'Transgender',
-  'Other'
-=======
   'EWS',
   'General',
   'OBC',
@@ -140,7 +79,6 @@ export const GENDERS = [
   'Male',
   'Other',
   'Transgender'
->>>>>>> second-copy
 ];
 
 export const SPONSOR_TYPES = [
@@ -148,8 +86,6 @@ export const SPONSOR_TYPES = [
   'State Scheme',
   'Centrally Sponsored'
 ];
-<<<<<<< HEAD
-=======
 
 export const STATE_CITIES = {
   'Andaman and Nicobar Islands': [
@@ -818,4 +754,3 @@ export const checkProfileCompleteness = (user) => {
 
   return true;
 };
->>>>>>> second-copy

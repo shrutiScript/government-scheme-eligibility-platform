@@ -2,39 +2,15 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
-<<<<<<< HEAD
-
-// Layouts
-import { MainLayout } from './layouts/MainLayout';
-import { AdminLayout } from './layouts/AdminLayout';
-=======
 import { Header } from './components/Header';
 import { AuthHeader } from './components/AuthHeader';
 import { Footer } from './components/Footer';
 import { ToastContainer } from './components/Toast';
->>>>>>> second-copy
 
 // Pages
 import { HomePage } from './pages/HomePage';
 import { SchemesPage } from './pages/SchemesPage';
 import { SchemeDetailPage } from './pages/SchemeDetailPage';
-<<<<<<< HEAD
-import { ProfilePage } from './pages/ProfilePage';
-import { DashboardPage } from './pages/DashboardPage';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
-
-// Protected Route Guard for Authenticated Users
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-[#0f2942] border-t-transparent"></div>
-=======
 import { EligibilityPage } from './pages/EligibilityPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -61,34 +37,17 @@ const AdminProtectedRoute = ({ children }) => {
     return (
       <div className="min-h-screen flex items-center justify-center font-bold text-slate-500 bg-slate-900 text-white">
         Loading Admin Console...
->>>>>>> second-copy
       </div>
     );
   }
 
-<<<<<<< HEAD
-  if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-=======
   if (!isAdmin && !adminToken) {
     return <Navigate to="/login" replace />;
->>>>>>> second-copy
   }
 
   return children;
 };
 
-<<<<<<< HEAD
-// Admin Route Guard for Admin Users Only
-const AdminRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-[#0f2942] border-t-transparent"></div>
-=======
 /**
  * Citizen Protected Route
  * Accessible strictly by authenticated Citizens in the current tab session.
@@ -102,85 +61,21 @@ const CitizenProtectedRoute = ({ children }) => {
     return (
       <div className="min-h-screen flex items-center justify-center font-bold text-slate-500">
         Loading...
->>>>>>> second-copy
       </div>
     );
   }
 
-<<<<<<< HEAD
-  if (!user || user.role !== 'admin') {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-=======
   if (citizenUser?.isBlocked) {
     return <Navigate to="/blocked" replace />;
   }
 
   if (!isCitizenAuthenticated) {
     return <Navigate to="/login" replace />;
->>>>>>> second-copy
   }
 
   return children;
 };
 
-<<<<<<< HEAD
-export function App() {
-  return (
-    <NotificationProvider>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            {/* Public & User Portal Routes — SmoothScroll lives in MainLayout */}
-            <Route path="/" element={<MainLayout />}>
-              <Route index element={<HomePage />} />
-              <Route path="schemes" element={<SchemesPage />} />
-              <Route path="schemes/:id" element={<SchemeDetailPage />} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="register" element={<RegisterPage />} />
-
-              {/* Redirect /eligibility directly to /dashboard */}
-              <Route path="eligibility" element={<Navigate to="/dashboard" replace />} />
-
-              {/* Protected User Routes */}
-              <Route 
-                path="profile" 
-                element={
-                  <ProtectedRoute>
-                    <ProfilePage />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                } 
-              />
-            </Route>
-
-            {/* Admin Panel — no SmoothScroll, uses overflow-y-auto inner scroll */}
-            <Route 
-              path="/admin" 
-              element={
-                <AdminRoute>
-                  <AdminLayout />
-                </AdminRoute>
-              }
-            >
-              <Route index element={<AdminDashboardPage />} />
-            </Route>
-
-            {/* Catch-all redirect */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </NotificationProvider>
-  );
-}
-=======
 /**
  * Auth Layout Wrapper
  * Strictly renders public unauthenticated AuthHeader on /login and /register.
@@ -413,6 +308,5 @@ export const App = () => {
     </AuthProvider>
   );
 };
->>>>>>> second-copy
 
 export default App;

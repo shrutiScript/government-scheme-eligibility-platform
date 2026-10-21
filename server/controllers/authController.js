@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-import User from '../models/User.js';
-import { generateToken } from '../middleware/authMiddleware.js';
-=======
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { generateToken, JWT_SECRET } from '../middleware/authMiddleware.js';
 import { logActivity } from '../utils/activityLogger.js';
->>>>>>> second-copy
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -64,22 +59,6 @@ export const registerUser = async (req, res, next) => {
       role: role === 'admin' ? 'admin' : 'user'
     });
 
-<<<<<<< HEAD
-    // 4. Generate JWT Token
-    const token = generateToken(user._id);
-
-    // 5. Return HTTP 201 response
-    return res.status(201).json({
-      success: true,
-      message: 'Registration successful',
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt
-      },
-=======
     // 4. Record registration activity (no sensitive data stored)
     await logActivity({
       action: 'User Registration',
@@ -95,7 +74,6 @@ export const registerUser = async (req, res, next) => {
       success: true,
       message: 'Registration successful',
       user: user.toJSON(),
->>>>>>> second-copy
       token
     });
   } catch (error) {
@@ -135,32 +113,22 @@ export const loginUser = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-    if (user.isBlocked) {
-      return res.status(403).json({
-        success: false,
-        message: 'Your account has been suspended by Administrator. Access is blocked.'
-=======
     // Blocked accounts must never be granted an authenticated session.
     if (user.isBlocked || user.status === 'blocked' || user.status === 'BLOCKED') {
       return res.status(403).json({
         success: false,
         message: 'Your account has been blocked. Please contact the administrator.'
->>>>>>> second-copy
       });
     }
 
     const token = generateToken(user._id);
 
-<<<<<<< HEAD
-=======
     await logActivity({
       action: 'User Login',
       user,
       details: `User "${user.name}" (${user.email}) signed in successfully.`
     });
 
->>>>>>> second-copy
     return res.status(200).json({
       success: true,
       message: 'Login successful',
@@ -172,8 +140,6 @@ export const loginUser = async (req, res, next) => {
   }
 };
 
-<<<<<<< HEAD
-=======
 // @desc    Logout current user (best-effort, does not require valid session)
 // @route   POST /api/auth/logout
 // @access  Public
@@ -382,7 +348,6 @@ export const updatePassword = async (req, res, next) => {
   }
 };
 
->>>>>>> second-copy
 // @desc    Get current user profile
 // @route   GET /api/auth/me
 // @access  Private
@@ -396,25 +361,15 @@ export const getMe = async (req, res, next) => {
       });
     }
 
-<<<<<<< HEAD
-    if (user.isBlocked) {
-      return res.status(403).json({
-        success: false,
-        message: 'Your account has been suspended by Administrator.'
-=======
     if (user.isBlocked || user.status === 'blocked' || user.status === 'BLOCKED') {
       return res.status(403).json({
         success: false,
         message: 'Your account has been blocked. Please contact the administrator.'
->>>>>>> second-copy
       });
     }
 
     return res.status(200).json({
       success: true,
-<<<<<<< HEAD
-      user
-=======
       user: user.toJSON()
     });
   } catch (error) {
@@ -606,7 +561,6 @@ export const resetPassword = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: 'Password reset successfully.'
->>>>>>> second-copy
     });
   } catch (error) {
     next(error);
